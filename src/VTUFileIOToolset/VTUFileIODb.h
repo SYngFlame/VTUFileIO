@@ -1,26 +1,26 @@
 /* -*- mode: c++ -*- */
-#ifndef Example1DB_h
-#define Example1DB_h
+#ifndef VTUFileIODB_h
+#define VTUFileIODB_h
 
 // Begin Local Includes
 #include <SAMDataDialog.h>
 
 // Forward declarations
-class Example1Form;
+class VTUFileIOForm;
 class QLineEdit;
 //
 // Class definition
 //
 
-class Example1DB : public SAMDataDialog
+class VTUFileIODB : public SAMDataDialog
 {
 	Q_OBJECT
 public:
 	/// Constructor.
-	Example1DB(Example1Form* form);
+	VTUFileIODB(VTUFileIOForm* form);
 
 	/// Destructor.
-	~Example1DB();
+	~VTUFileIODB();
 
 private:
 	// Data members

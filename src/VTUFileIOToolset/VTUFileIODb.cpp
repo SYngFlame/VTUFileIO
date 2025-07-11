@@ -1,5 +1,5 @@
-#include <Example1DB.h>
-#include <Example1Form.h>
+#include <VTUFileIODB.h>
+#include <VTUFileIOForm.h>
 
 #include <QValidator>
 #include <QLabel>
@@ -20,13 +20,13 @@
 
 
 
-Example1DB::Example1DB(Example1Form* form)
-	:SAMDataDialog(form, tr("Example1"), OK | CANCEL)
+VTUFileIODB::VTUFileIODB(VTUFileIOForm* form)
+	:SAMDataDialog(form, tr("VTUFileIO"), OK | CANCEL)
 {
 	setMinimumSize(470, 250);
 
 	/*************************Parameters*************************************/
-	QGroupBox* geomGroup = new QGroupBox(tr("Example1GroupBox"));
+	QGroupBox* geomGroup = new QGroupBox(tr("VTUFileIOGroupBox"));
 	QDoubleValidator* doubleValidator = new QDoubleValidator(geomGroup);
 
 	startPointEdit = new QLineEdit("0,0,0", geomGroup);
@@ -47,13 +47,13 @@ Example1DB::Example1DB(Example1Form* form)
 }
 
 /// Destructor.
-Example1DB::~Example1DB()
+VTUFileIODB::~VTUFileIODB()
 {
 
 }
 
 
-void Example1DB::onCmdOk(int id)
+void VTUFileIODB::onCmdOk(int id)
 {	
 	double p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
 	QString s, m, e; 
@@ -121,7 +121,7 @@ void Example1DB::onCmdOk(int id)
 	args.Put(p3y);
 	args.Put(p3z);
 
-	cmdGCommandDeliveryRole::Instance().SendCommand("import Example1");
+	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
 
 	omuMethodCall mc("mdb.models['Model-1'].parts['Part-1']", "drawExample", args);
 

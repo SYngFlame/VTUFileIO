@@ -1,8 +1,8 @@
 /* -*- mode: c++ -*- */
-#ifndef SAMExample1Fragment_h
-#define SAMExample1Fragment_h
+#ifndef SAMVTUFileIOFragment_h
+#define SAMVTUFileIOFragment_h
 
-#include <Example1Utils.h>
+#include <VTUFileIOUtils.h>
 #include <ptsKPartFragment.h>
 #include <g3dVector.h>
 #include <kefKLine.h>
@@ -11,11 +11,11 @@ class omuArguments;
 
 // Class definition
 
-class SAMExample1Fragment : public ptsKPartFragment
+class SAMVTUFileIOFragment : public ptsKPartFragment
 {
 public:
-	SAMExample1Fragment();
-	virtual ~SAMExample1Fragment();
+	SAMVTUFileIOFragment();
+	virtual ~SAMVTUFileIOFragment();
 
 	omuPrimitive* Copy() const;
 
@@ -24,4 +24,4 @@ public:
 	void DrawLine(int& segID, g3dVector startPoint, g3dVector endPoint);
 };
 
-#endif  // #ifdef SAMExample1Fragment_h
+#endif  // #ifdef SAMVTUFileIOFragment_h

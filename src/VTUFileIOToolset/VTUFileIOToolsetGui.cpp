@@ -1,6 +1,6 @@
-#include <Example1ToolsetGui.h>
-#include <Example1Form.h>
-#include <Example1Db.h>
+#include <VTUFileIOToolsetGui.h>
+#include <VTUFileIOForm.h>
+#include <VTUFileIODb.h>
 
 #include <rgnGRegionToolsetGui.h>
 #include <SAMMenuPane.h>
@@ -14,32 +14,32 @@
 
 
 
-Example1ToolsetGui::Example1ToolsetGui()
+VTUFileIOToolsetGui::VTUFileIOToolsetGui()
 	: SAMToolsetGui("Test"),
-	omiSingleton<Example1ToolsetGui>()
+	omiSingleton<VTUFileIOToolsetGui>()
 {
 	createMenuItems();
 	createToolboxItems();
 }
 
-Example1ToolsetGui::~Example1ToolsetGui()
+VTUFileIOToolsetGui::~VTUFileIOToolsetGui()
 {
 
 }
 
-void Example1ToolsetGui::activate()
+void VTUFileIOToolsetGui::activate()
 {
 	// todo
 	SAMToolsetGui::activate();
 }
 
-void Example1ToolsetGui::deactivate()
+void VTUFileIOToolsetGui::deactivate()
 {
 	// todo
 	SAMToolsetGui::deactivate();
 }
 
-void Example1ToolsetGui::createMenuItems()
+void VTUFileIOToolsetGui::createMenuItems()
 {
 	//todo
 	SAMMenu* testMenu = new SAMMenu(this, tr("&Curve"));
@@ -49,12 +49,12 @@ void Example1ToolsetGui::createMenuItems()
 	connect(example1Cmd, SIGNAL(triggered(bool)), this, SLOT(ExampleUi()));
 }
 
-void Example1ToolsetGui::createToolboxItems()
+void VTUFileIOToolsetGui::createToolboxItems()
 {
 	// todo
 }
 
-void Example1ToolsetGui::ExampleUi() {
-	Example1Form* aExample1Form = new Example1Form(this);
-	aExample1Form->onCmdActivate(this, 0, 0);
+void VTUFileIOToolsetGui::ExampleUi() {
+	VTUFileIOForm* aVTUFileIOForm = new VTUFileIOForm(this);
+	aVTUFileIOForm->onCmdActivate(this, 0, 0);
 }

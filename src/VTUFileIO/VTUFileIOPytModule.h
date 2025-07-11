@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*- */
-#ifndef Example1PytModule_h
-#define Example1PytModule_h
+#ifndef VTUFileIOPytModule_h
+#define VTUFileIOPytModule_h
 
 // Forward declarations
 
@@ -13,12 +13,12 @@
 
 // Class definition
 
-class Example1PytModule : public pyoModule
+class VTUFileIOPytModule : public pyoModule
 {
 public:
 
-	Example1PytModule();
-	virtual ~Example1PytModule();
+	VTUFileIOPytModule();
+	virtual ~VTUFileIOPytModule();
 	
 	virtual void DefineConstants();
 
@@ -28,8 +28,8 @@ public:
 
 private:
 
-	Example1PytModule(const Example1PytModule&);
-	Example1PytModule& operator=(const Example1PytModule&);
+	VTUFileIOPytModule(const VTUFileIOPytModule&);
+	VTUFileIOPytModule& operator=(const VTUFileIOPytModule&);
 };
 
 #endif  // #ifdef shipPytModule_h

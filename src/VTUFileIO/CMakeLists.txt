@@ -5,12 +5,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(
     ${LIBS_QT5_ROOT}/include
     ${LIBS_QT5_ROOT}/include/QtCore
-    ${LIBS_QT5_ROOT}/include/QtGui
-    ${LIBS_QT5_ROOT}/include/QtWidgets
     ${LIBS_PYTHON_ROOT}/include
     ${LIBS_OC_ROOT}/include
     ${LIBS_SAMSDK_ROOT}/include
     ${LIBS_SAMSDK_ROOT}/include/guiProject
+    
 )
   
 link_directories(
@@ -18,6 +17,7 @@ link_directories(
     ${LIBS_PYTHON_ROOT}/libs
     ${LIBS_OC_ROOT}/lib
 	${LIBS_SAMSDK_ROOT}/libs
+	${PROJECT_SOURCE_DIR}/lib
     ${LIBS_TCMALLOC_ROOT}
     ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
 )
@@ -43,55 +43,43 @@ source_group("Generated Files" FILES
 )
 
 # dynamic library
-add_library(Example1Toolset SHARED
+add_library(VTUFileIO SHARED
     ${TARGET_SRC}
     ${HEADERS_MOC}
     ${RESOUCES_RCC}
 )
 
 # compiler settings
-set_property(TARGET Example1Toolset
+set_property(TARGET VTUFileIO
     PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS _CRT_NON_CONFORMING_SWPRINTFS
 )
 
-set_target_properties(Example1Toolset PROPERTIES LINK_FLAGS /INCLUDE:"__tcmalloc")
+set_target_properties(VTUFileIO PROPERTIES LINK_FLAGS /INCLUDE:"__tcmalloc")
 
 
 
 add_definitions(
     -DUNICODE
     -D_UNICODE
-    -DQT_NO_DEBUG
-)
-
-set_target_properties(Example1Toolset PROPERTIES
-    OUTPUT_NAME "SAM.Pre.Example1Toolset"
 )
 
 # linker settings
-set_target_properties(Example1Toolset PROPERTIES
-    SUFFIX ".dll")
+set_target_properties(VTUFileIO PROPERTIES
+    SUFFIX ".pyd")
 
-target_link_libraries(Example1Toolset
-    Qt5Core
-    OrientBasicContainers
+target_link_libraries(VTUFileIO
+    Qt5Core.lib
+	OrientBasicContainers
     OrientBasicUtilities
     OrientBasicCoreUtilities
     OrientBasicPrimtives
     OrientPythonInterfaces
-    Qt5Core.lib
-    Qt5Widgets.lib
-    Qt5Gui.lib
-    OrientBasicPrimtives.lib
-    SAMIngQtSAM.lib
-    SAMGui.lib
-    libtcmalloc_minimal
-
-)
-
-
-add_custom_command(TARGET Example1Toolset POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:Example1Toolset>
-    ${LIBS_SAM_ROOT}/Release/FilePlugin/SAM.Pre.Example1Toolset.dll
+    SAMPythonModuleConfiguration
+    SAMCommonCommand
+    SAMKernelAttributesInterfaceObjects
+    SAMSessionCommonDefs
+    SAMSceneGraph
+    SAMPrimaryObjects
+    SAMKernel
+    libtcmalloc_minimal.lib
 )

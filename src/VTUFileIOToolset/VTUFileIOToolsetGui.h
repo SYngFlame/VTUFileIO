@@ -1,6 +1,6 @@
 /* -*- mode: c++ -*- */
-#ifndef Example1ToolsetGui_h
-#define Example1ToolsetGui_h
+#ifndef VTUFileIOToolsetGui_h
+#define VTUFileIOToolsetGui_h
 
 //
 // Includes
@@ -19,25 +19,25 @@
 
 
 
-class Example1Form;
+class VTUFileIOForm;
 
 //
 // Class definition
 //
 
-class Example1ToolsetGui : public SAMToolsetGui, public omiSingleton<Example1ToolsetGui>
+class VTUFileIOToolsetGui : public SAMToolsetGui, public omiSingleton<VTUFileIOToolsetGui>
 {
     Q_OBJECT
-    friend class omiSingleton<Example1ToolsetGui>;
+    friend class omiSingleton<VTUFileIOToolsetGui>;
 public:
 
     // Constructor and destructor:
-    Example1ToolsetGui();
-    ~Example1ToolsetGui();
+    VTUFileIOToolsetGui();
+    ~VTUFileIOToolsetGui();
 
 private:
     // Copy constructor and assignment operator
-    Example1ToolsetGui(const Example1ToolsetGui&);
+    VTUFileIOToolsetGui(const VTUFileIOToolsetGui&);
 
 protected:
     /// Activates modes when switching into derived module.

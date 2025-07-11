@@ -1,19 +1,19 @@
-#ifndef Example1ToolsetPlugin_h
-#define Example1ToolsetPlugin_h
+#ifndef VTUFileIOToolsetPlugin_h
+#define VTUFileIOToolsetPlugin_h
 
 #include <QtPlugin>
 #include <SAMToolsetGuiInterface.h>
 
 
 
-class Example1ToolsetPlugin : public QObject, SAMToolsetGuiInterface
+class VTUFileIOToolsetPlugin : public QObject, SAMToolsetGuiInterface
 {
 	Q_OBJECT
 	Q_PLUGIN_METADATA(IID SAMToolsetGuiPlugin_iid)
 	Q_INTERFACES(SAMToolsetGuiInterface)
 public:
-	Example1ToolsetPlugin();
-	virtual ~Example1ToolsetPlugin();
+	VTUFileIOToolsetPlugin();
+	virtual ~VTUFileIOToolsetPlugin();
 
 public:
 	virtual void registerToolset();

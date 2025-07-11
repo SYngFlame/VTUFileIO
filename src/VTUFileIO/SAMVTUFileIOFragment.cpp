@@ -1,4 +1,4 @@
-#include <SAMExample1Fragment.h>
+#include <SAMVTUFileIOFragment.h>
 #include <ptoKPart.h>
 #include <bmeMesh.h>
 #include <omeMesh.h>
@@ -13,33 +13,33 @@
 #include <gdyEditor.h>
 #include <cowList.T>
 
-static omuInterfaceObj::methodTable SAMExample1FMethods[] =
+static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
-	{"drawExample", (omuInterfaceObj::methodFunc)&SAMExample1Fragment::drawExample},
+	{"drawExample", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::drawExample},
 	{ 0, 0 }
 };
 
-static omuInterfaceObj::memberTable SAMExample1FMembers[] =
+static omuInterfaceObj::memberTable SAMVTUFileIOFMembers[] =
 {
 	{ 0, 0, 0 }
 };
 
-SAMExample1Fragment::SAMExample1Fragment()
+SAMVTUFileIOFragment::SAMVTUFileIOFragment()
 	: ptsKPartFragment()
 {
-	omuInterfaceObj::DescribeType("SAMExample1Fragment", SAMExample1FMethods, SAMExample1FMembers);
+	omuInterfaceObj::DescribeType("SAMVTUFileIOFragment", SAMVTUFileIOFMethods, SAMVTUFileIOFMembers);
 }
-SAMExample1Fragment::~SAMExample1Fragment()
+SAMVTUFileIOFragment::~SAMVTUFileIOFragment()
 {
 	// todo
 }
 
-omuPrimitive* SAMExample1Fragment::Copy() const
+omuPrimitive* SAMVTUFileIOFragment::Copy() const
 {
-	return new SAMExample1Fragment(*this);
+	return new SAMVTUFileIOFragment(*this);
 }
 
-omuPrimitive* SAMExample1Fragment::drawExample(omuArguments& args)
+omuPrimitive* SAMVTUFileIOFragment::drawExample(omuArguments& args)
 {
 	double p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
 	args.Begin();
@@ -72,7 +72,7 @@ omuPrimitive* SAMExample1Fragment::drawExample(omuArguments& args)
 	return 0;
 }
 
-void SAMExample1Fragment::DrawLine(int& segID, g3dVector startPoint, g3dVector endPoint)
+void SAMVTUFileIOFragment::DrawLine(int& segID, g3dVector startPoint, g3dVector endPoint)
 {
 	cowList<g3dVector> vertexXYZ;
 	QString color("red");
