@@ -11,6 +11,8 @@
 #include <basNewModel.h>
 #include <ptoKUtils.h>
 #include <bmeMesh.h> 
+#include <bmeElementClass.h>
+#include <bmeElementClassList.h>
 
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
@@ -75,6 +77,14 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 			}
 
 			const bmeElementData& elemData = objectMesh->ElementData();
+			const bmeElementClassList& elemClasses = elemData.ConstGetClasses();
+			for (int l = 0; l < elemClasses.Size(); ++l) {
+				const bmeElementClass& elemclass = elemClasses.ConstGet(l);
+				int index = elemclass.ClassIndex();
+				QString s_index = QString("element %1 class %2").arg(l).arg(index);
+				qDebug(qPrintable(s_index));
+				qDebug(qPrintable(elemclass.ElemTypeLabel()));
+			}
 		}
 	}
 	return 0;

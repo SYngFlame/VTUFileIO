@@ -61,7 +61,7 @@ void VTUFileIODB::onCmdOk(int id)
 
 	cmdGCommandDeliveryRole::Instance().SendCommand("session.viewports['Viewport: 1'].view.fitView()");
 
-	hide();
+	this->deleteLater();
 
 }
 
