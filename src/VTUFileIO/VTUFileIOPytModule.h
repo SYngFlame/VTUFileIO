@@ -22,10 +22,6 @@ public:
 	
 	virtual void DefineConstants();
 
-public:
-	
-	omuPrimitive* calcArea(omuArguments& args);
-
 private:
 
 	VTUFileIOPytModule(const VTUFileIOPytModule&);

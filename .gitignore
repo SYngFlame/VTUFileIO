@@ -1,5 +1,4 @@
 /CMakeLists.txt
 build/
 bin/
-!bin/Debug/samCAE.bat
 lib/

@@ -1,21 +1,20 @@
 #include <SAMVTUFileIOFragment.h>
 #include <ptoKPart.h>
-#include <bmeMesh.h>
-#include <omeMesh.h>
-#include <mesUtils.h>
-#include <bmeElementClass.h>
-#include <shpShape.h>
-#include <bmgUtils.h>
-#include <samMdbDrawable.h>
-#include <samModelDrawable.h>
-#include <samPartDrawable.h>
 #include <gdyScene.h>
 #include <gdyEditor.h>
 #include <cowList.T>
 
+#include <ptoKPart.h> 
+#include <ftrFeatureList.h>
+#include <basMdb.h>
+#include <basBasis.h>
+#include <basNewModel.h>
+#include <ptoKUtils.h>
+#include <bmeMesh.h> 
+
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
-	{"drawExample", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::drawExample},
+	{"printAll", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::printAll},
 	{ 0, 0 }
 };
 
@@ -39,57 +38,44 @@ omuPrimitive* SAMVTUFileIOFragment::Copy() const
 	return new SAMVTUFileIOFragment(*this);
 }
 
-omuPrimitive* SAMVTUFileIOFragment::drawExample(omuArguments& args)
+omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 {
-	double p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
-	args.Begin();
-	args.Get(p1x);
-	args.Get(p1y);
-	args.Get(p1z);
-	args.Get(p2x);
-	args.Get(p2y);
-	args.Get(p2z);
-	args.Get(p3x);
-	args.Get(p3y);
-	args.Get(p3z);
-	args.End();
+	basBasis* bas = basBasis::Instance();
+	basMdb mdb = bas->Fetch();
+	basModelMap modelsMap = mdb.GetModels();
+	cowListString modelList = modelsMap.Keys();
 
-	g3dVector startPoint, midPoint, endPoint;
-	startPoint.Set(p1x, p1y, p1z);
-	midPoint.Set(p2x, p2y, p2z);
-	endPoint.Set(p3x, p3y, p3z);
+	for (int i = 0; i < modelList.Length(); ++i) {
+		QString s = modelList.Get(i);
+		qDebug(qPrintable(s));
+		const ptoKPartRepository& parts = ptoKConstGetPartRepos(mdb, s);
+		for (int p = 1; p <= parts.Size(); ++p) {
+			QString partname = parts.GetKey(p);
+			qDebug(qPrintable(partname));
+			ptoKPart part = parts.ConstGet(p);
 
-	g3dVector curveP[2];
-	curveP[0] = startPoint;
-	
-	double t = 1.0 / 360;
-	for (int segID = 0; segID < 360; ++segID) {
-		double tt = t * segID;
-		curveP[!(segID & 1)] = pow(1 - tt, 2) * startPoint + 2 * tt * (1 - tt) * midPoint + pow(tt, 2) * endPoint;
-		DrawLine(segID, curveP[segID & 1], curveP[!(segID & 1)]);
+			ftrFeatureList* flpart = part.GetFeatureList();
+			const bmeMesh* objectMesh = flpart->ConstGetMesh(bdoDefaultInstId);
 
+			const bmeNodeData& nodeData = objectMesh->NodeData();
+			utiCoordCont3D nodeContainer = nodeData.CoordContainer();
+			cowListInt nodeList;
+			nodeData.GetUserNodeLabels(nodeList);
+			for (int n = 0; n < nodeList.Length(); ++n) {
+				int userLabel = nodeList.ConstGet(n);
+				float x, y, z;
+				nodeContainer.GetCoord(nodeData.GetMeshNodeIndex(userLabel), x, y, z);
+
+				QString pointMsg = QString("Node Label %1 (%2 ,%3, %4)").
+						arg(userLabel).
+						arg(x, 8, 'f', 2, ' ').
+						arg(y, 8, 'f', 2, ' ').
+						arg(z, 8, 'f', 2, ' ');
+				qDebug(qPrintable(pointMsg));
+			}
+
+			const bmeElementData& elemData = objectMesh->ElementData();
+		}
 	}
 	return 0;
-}
-
-void SAMVTUFileIOFragment::DrawLine(int& segID, g3dVector startPoint, g3dVector endPoint)
-{
-	cowList<g3dVector> vertexXYZ;
-	QString color("red");
-	vertexXYZ.Clear();
-	vertexXYZ.Append(startPoint);
-	vertexXYZ.Append(endPoint);
-
-	gdyScene* scn = gdyScene::GetCurrentScene(true);
-	gdyEditor* edit = scn->Editor();
-	kefKLine* drawLine = static_cast<kefKLine*>(edit->GetGeomEditorByType("kefKLine"));
-	if (!drawLine)
-	{
-		edit->AddGeomEditor(new kefKLine);
-		drawLine = static_cast<kefKLine*>(edit->GetGeomEditorByType("kefKLine"));
-	}
-
-	drawLine->createOneObject(segID, vertexXYZ, color);
-	scn->ExposeVP();// updata
-
 }

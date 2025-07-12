@@ -20,6 +20,7 @@
 
 
 class VTUFileIOForm;
+class basBasis;
 
 //
 // Class definition
@@ -55,7 +56,7 @@ protected:
 private:
     
 private slots:
-    void ExampleUi();
+    void PrintMsg();
 };
 
 #endif

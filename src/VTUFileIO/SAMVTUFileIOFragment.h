@@ -19,9 +19,7 @@ public:
 
 	omuPrimitive* Copy() const;
 
-	omuPrimitive* drawExample(omuArguments& args);
-
-	void DrawLine(int& segID, g3dVector startPoint, g3dVector endPoint);
+	omuPrimitive* printAll(omuArguments& args);
 };
 
 #endif  // #ifdef SAMVTUFileIOFragment_h

@@ -69,7 +69,7 @@ set_target_properties(VTUFileIO PROPERTIES
 
 target_link_libraries(VTUFileIO
     Qt5Core.lib
-	OrientBasicContainers
+    OrientBasicContainers
     OrientBasicUtilities
     OrientBasicCoreUtilities
     OrientBasicPrimtives
@@ -81,5 +81,10 @@ target_link_libraries(VTUFileIO
     SAMSceneGraph
     SAMPrimaryObjects
     SAMKernel
+    SAMModelDatabase.lib
+    SAMGeometryComponent.lib
+    SAMPrimaryObjects.lib
+    SAMCoreAttributes.lib
+    SAMCoreMeshDefs.lib
     libtcmalloc_minimal.lib
 )

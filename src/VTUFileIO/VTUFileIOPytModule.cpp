@@ -6,7 +6,6 @@
 
 static omuInterfaceObj::methodTable VTUFileIOPytModuleMethods[] =
 { 
-	{"calcArea", (omuInterfaceObj::methodFunc)&VTUFileIOPytModule::calcArea},
 	{0, 0} 
 };
 
@@ -27,18 +26,4 @@ VTUFileIOPytModule::~VTUFileIOPytModule()
 void VTUFileIOPytModule::DefineConstants()
 {
 	// do nothing
-}
-
-omuPrimitive* VTUFileIOPytModule::calcArea(omuArguments& args)
-{
-	double length, width;
-	args.Begin();
-	args.Get(length);
-	args.Get(width);
-	args.End();
-
-	double area;
-	area = length * width;
-
-	return new omuPrimNumber(area);
 }

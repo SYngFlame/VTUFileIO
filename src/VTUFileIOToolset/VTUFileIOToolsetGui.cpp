@@ -6,12 +6,10 @@
 #include <SAMMenuPane.h>
 #include <SAMMenuCommand.h>
 
-
 #include <cmdKCommandDeliveryRole.h>
 #include <omuArguments.h>
 #include <omuMethodCall.h>
 #include <omuPrimExpr.h>
-
 
 
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
@@ -42,11 +40,11 @@ void VTUFileIOToolsetGui::deactivate()
 void VTUFileIOToolsetGui::createMenuItems()
 {
 	//todo
-	SAMMenu* testMenu = new SAMMenu(this, tr("&Curve"));
+	SAMMenu* testMenu = new SAMMenu(this, tr("&VTK"));
 
-	SAMMenuCommand* example1Cmd = new SAMMenuCommand(this, testMenu, tr("&BezierCurve"));
-	testMenu->addAction(example1Cmd);
-	connect(example1Cmd, SIGNAL(triggered(bool)), this, SLOT(ExampleUi()));
+	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
+	testMenu->addAction(printCmd);
+	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
 }
 
 void VTUFileIOToolsetGui::createToolboxItems()
@@ -54,7 +52,7 @@ void VTUFileIOToolsetGui::createToolboxItems()
 	// todo
 }
 
-void VTUFileIOToolsetGui::ExampleUi() {
+void VTUFileIOToolsetGui::PrintMsg() {
 	VTUFileIOForm* aVTUFileIOForm = new VTUFileIOForm(this);
 	aVTUFileIOForm->onCmdActivate(this, 0, 0);
 }
