@@ -7,24 +7,45 @@
 #define ERRORTYPE_FILEWRITEFAILED -3
 
 #include <QtPlugin>
-#include <basMdb.h>
 #include <qvector.h>
+
+#include <basMdb.h>
+
+enum omuObjectToDisplayTypeEnm;
+enum VTKType {
+	VTKLegacy,
+	VTU
+};
+
+struct TargetList{
+	QString targetPath;
+	QString targetModel;
+	QString targetPart;
+	VTKType type;
+	omuObjectToDisplayTypeEnm displayMode;
+
+	bool withOdb;
+	TargetList();
+};
 
 class VTUFileManager
 {
 private:
-	const basMdb* mdb;
-	QVector<QString> SAMmodels;
-	QVector<QVector<QString>> SAMparts;
-	QString VTKPath;
+	basMdb mdb;
+	TargetList target;
+
+	const ptoKPartRepository& GetModelParts();
+	int VTUFileManager::writeSinglePart();
+	int VTUFileManager::writeAllParts();
+	int VTUFileManager::writeODB();
 
 public:
 	VTUFileManager();
 	virtual ~VTUFileManager();
-	int isReady();
+	//int Ready();
 
-	int Init(basMdb* mdb, const QString& path);
-	int GenerateTarget();
+	int Init(const QString& targetPath, const QString& display, const QString& modelName, const QString& partName);
 	int WriteTarget();
+	int ReadTarget();
 };
 

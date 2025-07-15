@@ -1,19 +1,13 @@
 #include <VTUFileIOToolsetGui.h>
 #include <VTUFileIOForm.h>
 #include <VTUFileIODb.h>
+#include <VTUFileIOCommand.h>
 
 #include <rgnGRegionToolsetGui.h>
 #include <SAMMenuPane.h>
 #include <SAMMenuCommand.h>
 
-#include <cmdKCommandDeliveryRole.h>
-#include <omuArguments.h>
-#include <omuMethodCall.h>
-#include <omuPrimExpr.h>
 #include <SAMFileDialog.h>
-#include <SAMBoolKeyword.h>
-#include <cmdGCommandDeliveryRole.h>
-
 
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
 	: SAMToolsetGui("Test"),
@@ -59,22 +53,16 @@ void VTUFileIOToolsetGui::createToolboxItems()
 }
 
 void VTUFileIOToolsetGui::PrintMsg() {
-	VTUFileIOForm* aVTUFileIOForm = new VTUFileIOForm(this);
-	aVTUFileIOForm->onCmdActivate(this, 0, 0);
+	VTUFileIOCommand::CommitPrint();
 }
 
 void VTUFileIOToolsetGui::SaveDialog() {
-	QString path;
-	SAMFileDialog* fileDialog = new SAMFileDialog(this, "Select existing directory for VTK files", 0);
-	fileDialog->selectFile(path);
+	
+	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
+	fileDialog->setFileMode(QFileDialog::AnyFile);
+	fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+	fileDialog->setNameFilters(QStringList("VTK Legacy"));
 
-	omuArguments args;
-	args.Put(path);
-
-	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
-	omuMethodCall mc("mdb.models['Model-1'].parts['Part-1']", "initManager", args);
-	QString cmd;
-	cmd.append(mc);
-	cmdGCommandDeliveryRole::Instance().SendCommand(cmd);
-	cmdGCommandDeliveryRole::Instance().SendCommand("session.viewports['Viewport: 1'].view.fitView()");
+	QObject::connect(fileDialog, SIGNAL(SAMFileDialog::onFileSelected), NULL, SLOT(VTUFileIOCommand::CommitSave));
+	fileDialog->show();
 }

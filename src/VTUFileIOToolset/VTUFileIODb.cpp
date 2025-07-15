@@ -66,6 +66,25 @@ void VTUFileIODB::onCmdOk(int id)
 }
 
 
+//wasted
+void VTUFileIODB::trans() {
+	omuArguments args;
+
+	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
+
+	omuMethodCall mc("mdb.models['Model-1'].parts['Part-1']", "printAll", args);
+
+	QString cmd;
+	cmd.append(mc);
+
+	cmdGCommandDeliveryRole::Instance().SendCommand(cmd);
+
+	cmdGCommandDeliveryRole::Instance().SendCommand("session.viewports['Viewport: 1'].view.fitView()");
+
+	this->deleteLater();
+}
+
+
 
 
 

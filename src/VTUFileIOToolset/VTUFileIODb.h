@@ -21,6 +21,7 @@ public:
 
 	/// Destructor.
 	~VTUFileIODB();
+	void trans();
 
 private:
 	// Data members

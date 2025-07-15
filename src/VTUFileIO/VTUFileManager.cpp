@@ -2,62 +2,103 @@
 
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
+#include <visKSceneManager.h>
 
+#include <basMdb.h>
 #include <basBasis.h>
 #include <basNewModel.h>
 #include <ptoKUtils.h>
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
+#include <sesKSessionState.h>
+
+#include <qfile.h>
 
 VTUFileManager::VTUFileManager() {
-	mdb = NULL;
+	
 }
 
 VTUFileManager::~VTUFileManager() {
+}
 
+TargetList::TargetList() {
+	targetPath = "";
+	type = VTKLegacy;
+	withOdb = false;
+	displayMode = omu_NONE;
+}
+
+const ptoKPartRepository& VTUFileManager::GetModelParts() {
+
+	basBasis* bas = basBasis::Instance();
+
+	this->mdb = bas->Fetch();
+	return ptoKConstGetPartRepos(mdb, target.targetModel);
 }
 
 /*
-Read in mdb for extract nodes and elements
+Read in mdb for extract nodes and elements and path to output VTK files
 */
-int VTUFileManager::Init(basMdb* mdb, const QString& path) {
-	this->mdb = mdb;
-	this->VTKPath = path;
-
-	if (mdb == NULL) 
-		return ERRORTYPE_NOTEXIST;
-
-	basModelMap modelsMap = mdb->GetModels();
-	cowListString modelList = modelsMap.Keys();
-	QVector<QString> model_parts;
+int VTUFileManager::Init(const QString& path, const QString& display, const QString& modelName, const QString& partName) {
 	
-	for (int i = 0; i < modelList.Length(); ++i) {
-		QString modelname = modelList.Get(i);
-		SAMmodels.append(modelname);
-		model_parts = QVector<QString>(modelList.Length());
-		const ptoKPartRepository& parts = ptoKConstGetPartRepos(*mdb, modelname);
-
-		//TODO:Protection while parts not exist.
-
-		for (int p = 1; p <= parts.Size(); ++p) {
-			QString partname = parts.GetKey(p);
-			model_parts.append(partname);
-		}
-		SAMparts.append(model_parts);
-	}
+	this->target.targetPath = path;
+	this->target.displayMode = omuPrimType::ConverStringToType(display);
+	this->target.targetModel = modelName;
+	this->target.targetPart = partName;
 	return 0;
 };
 
-/*
-* Everything normal if return 0;
-* If mdb not exist , return -1.
-*/
-int VTUFileManager::isReady() {
-	if (mdb == NULL||
-		SAMmodels.isEmpty()||
-		SAMparts.isEmpty()
-		) 
+int VTUFileManager::WriteTarget() {
+	QFile f(target.targetPath);
+	if (f.exists()) {
+		//TODO:Warning box
+	}
+	f.open(QIODevice::WriteOnly | QIODevice::Truncate);
+	switch (target.displayMode) {
+		case omu_PART: {
+			return writeSinglePart();
+		}
+		case omu_ASSEMBLY: {
+			return writeAllParts();
+		}
+		case omu_ODB: {
+			return writeODB();
+		}
+	}
+	return 0;
+}
+int VTUFileManager::ReadTarget() {
+	return 0;
+}
+///*
+//* Everything normal if return 0;
+//* If mdb not exist , return -1.
+//*/
+//int VTUFileManager::Ready() {
+//	if (SAMmodels.isEmpty()||SAMparts.isEmpty()) 
+//		return ERRORTYPE_NOTEXIST;
+//	return 0;
+//}
+
+int VTUFileManager::writeSinglePart() {
+	const ptoKPartRepository& parts = GetModelParts();
+	if (parts.Size() == 0)
 		return ERRORTYPE_NOTEXIST;
+	return VTKExportPart(parts.ConstGet(target.targetPart))
+}
+
+int VTUFileManager::writeAllParts() {
+	const ptoKPartRepository& parts = GetModelParts();
+	if (parts.Size() == 0)
+		return ERRORTYPE_NOTEXIST;
+	int status = 0;
+	for (int i; i < parts.Size(); ++i) {
+		status &= VTKExportPart(parts.ConstGet(i));
+	}
+	return status;
+}
+
+int VTUFileManager::writeODB() {
 	return 0;
 }

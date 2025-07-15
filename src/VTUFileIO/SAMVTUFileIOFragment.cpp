@@ -53,15 +53,18 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 		QString s = modelList.Get(i);
 		qDebug(qPrintable(s));
 		const ptoKPartRepository& parts = ptoKConstGetPartRepos(mdb, s);
+		if (parts.IsEmpty()) return 0;
 		for (int p = 1; p <= parts.Size(); ++p) {
 			QString partname = parts.GetKey(p);
 			qDebug(qPrintable(partname));
 			
 			ptoKPart part = parts.ConstGet(p);
-
 			ftrFeatureList* flpart = part.GetFeatureList();
-			const bmeMesh* objectMesh = flpart->ConstGetMesh(bdoDefaultInstId);
 
+			if (!flpart->MeshExists(bdoDefaultInstId)) continue;
+
+			const bmeMesh* objectMesh = flpart->ConstGetMesh(bdoDefaultInstId);
+			if (!objectMesh->NumNodes()) return 0;
 			const bmeNodeData& nodeData = objectMesh->NodeData();
 			utiCoordCont3D nodeContainer = nodeData.CoordContainer();
 			cowListInt nodeList;
@@ -93,23 +96,30 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 	return 0;
 }
 omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
-	basBasis* bas = basBasis::Instance();
-	basMdb mdb = bas->Fetch();
+
 	QString path;
+	QString display;
+	QString modelName;
+	QString partName;
+
 	args.Begin();
 	args.Get(path);
+	args.Get(display);
+	args.Get(modelName);
+	args.Get(partName);
 	args.End();
+
 	fileManager = (VTUFileManager*)malloc(sizeof(VTUFileManager));
 	if (fileManager != NULL)
 	{
-		int status = fileManager->Init(&mdb, path);
-		if (!status && !(status = fileManager->GenerateTarget()))
+		int status = fileManager->Init(path, display, modelName, partName);
+		if (!status && !(status = fileManager->GenerateTarget()) && !(status = fileManager->Ready()))
 		{
 			fileManager->WriteTarget(); 
 		}
 		else {
-			ErrHandler::Report(status);
+			//ErrHandler::Report(status);
+			return 0;
 		}
-		
 	}
 }

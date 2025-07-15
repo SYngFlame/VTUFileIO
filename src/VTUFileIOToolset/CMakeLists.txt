@@ -73,20 +73,11 @@ set_target_properties(VTUFileIOToolset PROPERTIES
     SUFFIX ".dll")
 
 target_link_libraries(VTUFileIOToolset
-    Qt5Core
-    OrientBasicContainers
-    OrientBasicUtilities
-    OrientBasicCoreUtilities
-    OrientBasicPrimtives
-    OrientPythonInterfaces
-    Qt5Core.lib
-    Qt5Widgets.lib
-    Qt5Gui.lib
-    OrientBasicPrimtives.lib
-    SAMIngQtSAM.lib
-    SAMGui.lib
+    ${LIBS_QT5_ROOT}/lib/*.lib
+    ${LIBS_PYTHON_ROOT}/libs/*.lib
+    ${LIBS_OC_ROOT}/lib/*.lib
+	${LIBS_SAMSDK_ROOT}/libs/*.lib
     libtcmalloc_minimal
-
 )
 
 

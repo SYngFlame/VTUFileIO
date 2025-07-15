@@ -9,7 +9,8 @@ include_directories(
     ${LIBS_OC_ROOT}/include
     ${LIBS_SAMSDK_ROOT}/include
     ${LIBS_SAMSDK_ROOT}/include/guiProject
-    
+
+    ${LIBS_VTK_ROOT}/include
 )
   
 link_directories(
@@ -20,6 +21,8 @@ link_directories(
 	${PROJECT_SOURCE_DIR}/lib
     ${LIBS_TCMALLOC_ROOT}
     ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+
+    ${LIBS_VTK_ROOT}/lib
 )
 
 # source list
@@ -68,8 +71,6 @@ set_target_properties(VTUFileIO PROPERTIES
     SUFFIX ".pyd")
 
 target_link_libraries(VTUFileIO
-    Qt5Core.lib
-    OrientBasicContainers
     OrientBasicUtilities
     OrientBasicCoreUtilities
     OrientBasicPrimtives
@@ -81,10 +82,10 @@ target_link_libraries(VTUFileIO
     SAMSceneGraph
     SAMPrimaryObjects
     SAMKernel
-    SAMModelDatabase.lib
-    SAMGeometryComponent.lib
-    SAMPrimaryObjects.lib
-    SAMCoreAttributes.lib
-    SAMCoreMeshDefs.lib
+    ${LIBS_QT5_ROOT}/lib/*.lib
+    ${LIBS_PYTHON_ROOT}/libs/*.lib
+    ${LIBS_OC_ROOT}/lib/*.lib
+	${LIBS_SAMSDK_ROOT}/libs/*.lib
+	${PROJECT_SOURCE_DIR}/lib/*.lib
     libtcmalloc_minimal.lib
 )
