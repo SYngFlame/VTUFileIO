@@ -57,6 +57,7 @@ private:
     
 private slots:
     void PrintMsg();
+    void SaveDialog();
 };
 
 #endif

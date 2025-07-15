@@ -17,6 +17,7 @@
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
 	{"printAll", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::printAll},
+	{"initManager",(omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::initManager},
 	{ 0, 0 }
 };
 
@@ -29,10 +30,11 @@ SAMVTUFileIOFragment::SAMVTUFileIOFragment()
 	: ptsKPartFragment()
 {
 	omuInterfaceObj::DescribeType("SAMVTUFileIOFragment", SAMVTUFileIOFMethods, SAMVTUFileIOFMembers);
+	fileManager = NULL;
 }
 SAMVTUFileIOFragment::~SAMVTUFileIOFragment()
 {
-	// todo
+	if (fileManager != NULL) free(fileManager);
 }
 
 omuPrimitive* SAMVTUFileIOFragment::Copy() const
@@ -54,6 +56,7 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 		for (int p = 1; p <= parts.Size(); ++p) {
 			QString partname = parts.GetKey(p);
 			qDebug(qPrintable(partname));
+			
 			ptoKPart part = parts.ConstGet(p);
 
 			ftrFeatureList* flpart = part.GetFeatureList();
@@ -88,4 +91,25 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 		}
 	}
 	return 0;
+}
+omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
+	basBasis* bas = basBasis::Instance();
+	basMdb mdb = bas->Fetch();
+	QString path;
+	args.Begin();
+	args.Get(path);
+	args.End();
+	fileManager = (VTUFileManager*)malloc(sizeof(VTUFileManager));
+	if (fileManager != NULL)
+	{
+		int status = fileManager->Init(&mdb, path);
+		if (!status && !(status = fileManager->GenerateTarget()))
+		{
+			fileManager->WriteTarget(); 
+		}
+		else {
+			ErrHandler::Report(status);
+		}
+		
+	}
 }
