@@ -8,6 +8,7 @@
       <li><b>VTKFileIO</b>
         <ul style="list-style-type: disc;">
           <li>SAMVTKFileIOFragment  /SAM内核数据访问核心
+          <li>VTUDataContainer    /VTK中转数据缓存
           <li>VTUElementHandler /SAM单元类型枚举方法
           <li>VTUFileManager    /SAM VTK数据中转
           <li>VTUFileWriter /引用VTK库的数据写出方法

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <ErrorType.h>
+#include <ErrorHandler.h>
 
 #include <QtPlugin>
-#include <qvector.h>
 #include <ptoKPartRepository.h>
 
 class VTUFileWriter;
@@ -16,14 +15,17 @@ enum VTKType {
 };
 
 struct TargetList{
-	QString targetPath;
-	QString targetModel;
-	QString targetPart;
+	const wchar_t* targetPath;
+	const wchar_t* targetModel;
+	const wchar_t* targetPart;
 	VTKType type;
-	omuObjectToDisplayTypeEnm displayMode;
+	int displayMode;//int type of omuObjectToDisplayTypeEnm
 
 	bool withOdb;
 	TargetList();
+	QString TargetList::TargetModel();
+	QString TargetList::TargetPart();
+	QString TargetList::TargetPath();
 };
 
 class VTUFileManager
@@ -40,10 +42,9 @@ private:
 public:
 	VTUFileManager();
 	virtual ~VTUFileManager();
-	//int Ready();
 
-	int Init(const QString& targetPath, const QString& display, const QString& modelName, const QString& partName);
-	int WriteTarget();
+	int Init(const QString& targetPath, const int& display, const QString& modelName, const QString& partName);
+	int WriteCache();
 	int ReadTarget();
 };
 

@@ -9,9 +9,9 @@
 #include <basBasis.h>
 #include <basNewModel.h>
 #include <omuPrimType.h>
+#include <FEOdb.h>
 
 #include <VTUFileWriter.h>
-
 #include <qfile.h>
 
 VTUFileManager::VTUFileManager() {
@@ -21,7 +21,9 @@ VTUFileManager::~VTUFileManager() {
 }
 
 TargetList::TargetList() {
-	targetPath = "";
+	targetPath = NULL;
+	targetPart = NULL;
+	targetModel = NULL;
 	type = VTKLegacy;
 	withOdb = false;
 	displayMode = omu_NONE;
@@ -38,22 +40,18 @@ const ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 /*
 Read in mdb for extract nodes and elements and path to output VTK files
 */
-int VTUFileManager::Init(const QString& path, const QString& display, const QString& modelName, const QString& partName) {
+int VTUFileManager::Init(const QString& path, const int& display, const QString& modelName, const QString& partName) {
 	
-	this->target.targetPath = path;
-	this->target.displayMode = omuPrimType::ConverStringToType(display);
-	this->target.targetModel = modelName;
-	this->target.targetPart = partName;
+	this->target.targetPath = reinterpret_cast<const wchar_t*>(path.utf16());
+	this->target.displayMode = display;
+	this->target.targetModel = reinterpret_cast<const wchar_t*>(modelName.utf16());
+	this->target.targetPart = reinterpret_cast<const wchar_t*>(partName.utf16());
 	return 0;
 };
 
-int VTUFileManager::WriteTarget() {
-	QFile f(target.targetPath);
-	if (f.exists()) {
-		//TODO:Warning box
-	}
-	f.open(QIODevice::WriteOnly | QIODevice::Truncate);
-	writer = new VTUFileWriter(&f);
+int VTUFileManager::WriteCache() {
+	
+	writer = new VTUFileWriter();
 	switch (target.displayMode) {
 		case omu_PART: {
 			return writeSinglePart();
@@ -65,40 +63,45 @@ int VTUFileManager::WriteTarget() {
 			return writeODB();
 		}
 	}
-	f.close();
-	return 0;
+	return ERRORTYPE_WRONGSCENE;
 }
+
 int VTUFileManager::ReadTarget() {
 	return 0;
 }
-///*
-//* Everything normal if return 0;
-//* If mdb not exist , return -1.
-//*/
-//int VTUFileManager::Ready() {
-//	if (SAMmodels.isEmpty()||SAMparts.isEmpty()) 
-//		return ERRORTYPE_NOTEXIST;
-//	return 0;
-//}
 
 int VTUFileManager::writeSinglePart() {
-	const ptoKPartRepository parts = GetModelParts(target.targetModel);
-	if (parts.Size() == 0)
+	const ptoKPartRepository parts = GetModelParts(target.TargetModel());
+	if (parts.IsEmpty())
 		return ERRORTYPE_NOTEXIST;
-	return writer->VTKExportPart(parts.ConstGet(target.targetPart));
+	return writer->GetVTKPart(parts.ConstGet(target.TargetPart()));
 }
 
 int VTUFileManager::writeAllParts() {
-	const ptoKPartRepository& parts = GetModelParts(target.targetModel);
-	if (parts.Size() == 0)
+	const ptoKPartRepository& parts = GetModelParts(target.TargetModel());
+	if (parts.IsEmpty())
 		return ERRORTYPE_NOTEXIST;
 	int status = 0;
-	for (int i = 0; i < parts.Size(); ++i) {
-		status &= writer->VTKExportPart(parts.ConstGet(i));
+	for (int i = 1; i <= parts.Size(); ++i) {
+		status &= writer->GetVTKPart(parts.ConstGet(i));
 	}
 	return status;
 }
 
 int VTUFileManager::writeODB() {
-	return 0;
+	//FEOdb::get
+	
+	return writer->VTKExportODB();
+}
+
+QString TargetList::TargetModel() {
+	return QString::fromWCharArray(targetModel);
+}
+
+QString TargetList::TargetPart() {
+	return QString::fromWCharArray(targetPart);
+}
+
+QString TargetList::TargetPath() {
+	return QString::fromWCharArray(targetPath);
 }

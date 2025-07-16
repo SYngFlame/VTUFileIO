@@ -16,7 +16,6 @@
 void VTUFileIOCommand::CommitPrint() {
 	omuArguments args;
 
-	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
 	const sesGVpContext& context = sesGSessionState::Instance()->ConstGetVpContext();
 	QString pyt = QString("mdb.models['%1'].parts['%2']").arg(context.ModelName()).arg(context.PartName());
 	if (context.ModelName().isEmpty() || context.PartName().isEmpty()) return;
@@ -29,13 +28,14 @@ void VTUFileIOCommand::CommitPrint() {
 }
 
 void VTUFileIOCommand::CommitSave(const QString& path) {
-	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
-	const sesGVpContext& context = sesGSessionState::Instance()->ConstGetVpContext();
-	QString pyt = QString("mdb.models['%1'].parts['%2']").arg(context.ModelName()).arg(context.PartName());
 
-	omuArguments args;
+	const sesGVpContext& context = sesGSessionState::Instance()->ConstGetVpContext();
+	//TODO:Print Messages when there's nothing in context or else
+	QString pyt = QString("mdb.models['%1'].parts['%2']").arg(context.ModelName()).arg(context.PartName());
+	if (context.ModelName().isEmpty() || context.PartName().isEmpty()) return;
+	omuArguments args(4);
 	args.Put(path);
-	args.Put(context.TypeByModule());
+	args.Put((int)(context.TypeByModule()));
 	args.Put(context.ModelName());
 	args.Put(context.PartName());
 
@@ -44,3 +44,7 @@ void VTUFileIOCommand::CommitSave(const QString& path) {
 	cmd.append(mc);
 	cmdGCommandDeliveryRole::Instance().SendCommand(cmd);
 } 
+
+void VTUFileIOCommand::CommitLoad() {
+	cmdGCommandDeliveryRole::Instance().SendCommand("import VTUFileIO");
+}

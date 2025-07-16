@@ -15,6 +15,8 @@
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
 
+#include <ErrorHandler.h>
+
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
 	{"printAll", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::printAll},
@@ -99,10 +101,9 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 
 	QString path;
-	QString display;
+	int display;
 	QString modelName;
 	QString partName;
-
 	args.Begin();
 	args.Get(path);
 	args.Get(display);
@@ -110,17 +111,17 @@ omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 	args.Get(partName);
 	args.End();
 
+	int status = 0;
 	fileManager = (VTUFileManager*)malloc(sizeof(VTUFileManager));
 	if (fileManager != NULL)
 	{
-		int status = fileManager->Init(path, display, modelName, partName);
-		if (!status)
-		{
-			fileManager->WriteTarget(); 
-		}
-		else {
-			//ErrHandler::Report(status);
-			return 0;
+		status = fileManager->Init(path, display, modelName, partName);
+		if (!(status = fileManager->WriteCache())) {
+			//fileManager->WriteFile();
+
 		}
 	}
+	else status &= ERRORTYPE_MEMORYALLOCFAILED;
+	ErrorHandler::ReportErr(status);
+	return 0;
 }

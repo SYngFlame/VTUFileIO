@@ -7,6 +7,7 @@
 #include <SAMMenuPane.h>
 #include <SAMMenuCommand.h>
 
+#include <cmdGCommandDeliveryRole.h>
 #include <SAMFileDialog.h>
 
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
@@ -15,6 +16,8 @@ VTUFileIOToolsetGui::VTUFileIOToolsetGui()
 {
 	createMenuItems();
 	createToolboxItems();
+	VTUFileIOCommand::CommitLoad();
+
 }
 
 VTUFileIOToolsetGui::~VTUFileIOToolsetGui()
@@ -64,6 +67,10 @@ void VTUFileIOToolsetGui::SaveDialog() {
 	fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
 	//fileDialog->setNameFilters(QStringList("VTK Legacy(*.vtk)"));
 
-	QObject::connect(fileDialog, SIGNAL(SAMFileDialog::onFileSelected), NULL, SLOT(VTUFileIOCommand::CommitSave));
+	QObject::connect(fileDialog, SIGNAL(onFileSelected(const QString&)), this, SLOT(OnSave(const QString&)));
 	fileDialog->show();
+}
+
+void VTUFileIOToolsetGui::OnSave(const QString& path) {
+	VTUFileIOCommand::CommitSave(path);
 }
