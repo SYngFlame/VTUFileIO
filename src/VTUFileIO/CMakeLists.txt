@@ -87,5 +87,6 @@ target_link_libraries(VTUFileIO
     ${LIBS_OC_ROOT}/lib/*.lib
 	${LIBS_SAMSDK_ROOT}/libs/*.lib
 	${PROJECT_SOURCE_DIR}/lib/*.lib
+    ${LIBS_VTK_ROOT}/lib/*.lib
     libtcmalloc_minimal.lib
 )

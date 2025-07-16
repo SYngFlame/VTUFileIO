@@ -1,22 +1,20 @@
 #include "VTUFileManager.h"
 
+#include <ptoKUtils.h>
+#include <ptoKPartRepository.h>
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
-#include <visKSceneManager.h>
 
 #include <basMdb.h>
 #include <basBasis.h>
 #include <basNewModel.h>
-#include <ptoKUtils.h>
-#include <bmeMesh.h> 
-#include <bmeElementClass.h>
-#include <bmeElementClassList.h>
-#include <sesKSessionState.h>
+#include <omuPrimType.h>
+
+#include <VTUFileWriter.h>
 
 #include <qfile.h>
 
 VTUFileManager::VTUFileManager() {
-	
 }
 
 VTUFileManager::~VTUFileManager() {
@@ -29,12 +27,12 @@ TargetList::TargetList() {
 	displayMode = omu_NONE;
 }
 
-const ptoKPartRepository& VTUFileManager::GetModelParts() {
+const ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 
 	basBasis* bas = basBasis::Instance();
 
-	this->mdb = bas->Fetch();
-	return ptoKConstGetPartRepos(mdb, target.targetModel);
+	basMdb mdb = bas->Fetch();
+	return ptoKConstGetPartRepos(mdb, model);
 }
 
 /*
@@ -55,6 +53,7 @@ int VTUFileManager::WriteTarget() {
 		//TODO:Warning box
 	}
 	f.open(QIODevice::WriteOnly | QIODevice::Truncate);
+	writer = new VTUFileWriter(&f);
 	switch (target.displayMode) {
 		case omu_PART: {
 			return writeSinglePart();
@@ -66,6 +65,7 @@ int VTUFileManager::WriteTarget() {
 			return writeODB();
 		}
 	}
+	f.close();
 	return 0;
 }
 int VTUFileManager::ReadTarget() {
@@ -82,19 +82,19 @@ int VTUFileManager::ReadTarget() {
 //}
 
 int VTUFileManager::writeSinglePart() {
-	const ptoKPartRepository& parts = GetModelParts();
+	const ptoKPartRepository parts = GetModelParts(target.targetModel);
 	if (parts.Size() == 0)
 		return ERRORTYPE_NOTEXIST;
-	return VTKExportPart(parts.ConstGet(target.targetPart))
+	return writer->VTKExportPart(parts.ConstGet(target.targetPart));
 }
 
 int VTUFileManager::writeAllParts() {
-	const ptoKPartRepository& parts = GetModelParts();
+	const ptoKPartRepository& parts = GetModelParts(target.targetModel);
 	if (parts.Size() == 0)
 		return ERRORTYPE_NOTEXIST;
 	int status = 0;
-	for (int i; i < parts.Size(); ++i) {
-		status &= VTKExportPart(parts.ConstGet(i));
+	for (int i = 0; i < parts.Size(); ++i) {
+		status &= writer->VTKExportPart(parts.ConstGet(i));
 	}
 	return status;
 }

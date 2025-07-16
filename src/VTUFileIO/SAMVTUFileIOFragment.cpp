@@ -1,15 +1,16 @@
 #include <SAMVTUFileIOFragment.h>
-#include <ptoKPart.h>
+
 #include <gdyScene.h>
 #include <gdyEditor.h>
 #include <cowList.T>
 
+#include <ptoKUtils.h>
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
 #include <basMdb.h>
 #include <basBasis.h>
 #include <basNewModel.h>
-#include <ptoKUtils.h>
+
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
@@ -113,7 +114,7 @@ omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 	if (fileManager != NULL)
 	{
 		int status = fileManager->Init(path, display, modelName, partName);
-		if (!status && !(status = fileManager->GenerateTarget()) && !(status = fileManager->Ready()))
+		if (!status)
 		{
 			fileManager->WriteTarget(); 
 		}

@@ -1,15 +1,13 @@
 #pragma once
 
-#define TASK_EXPORT 0
-#define TASK_IMPORT 1
-#define ERRORTYPE_NOTEXIST -1
-#define ERRORTYPE_FILEREADFAILED -2
-#define ERRORTYPE_FILEWRITEFAILED -3
+#include <ErrorType.h>
 
 #include <QtPlugin>
 #include <qvector.h>
+#include <ptoKPartRepository.h>
 
-#include <basMdb.h>
+class VTUFileWriter;
+
 
 enum omuObjectToDisplayTypeEnm;
 enum VTKType {
@@ -31,10 +29,10 @@ struct TargetList{
 class VTUFileManager
 {
 private:
-	basMdb mdb;
 	TargetList target;
+	VTUFileWriter* writer;
 
-	const ptoKPartRepository& GetModelParts();
+	static const ptoKPartRepository& GetModelParts(const QString& model);
 	int VTUFileManager::writeSinglePart();
 	int VTUFileManager::writeAllParts();
 	int VTUFileManager::writeODB();

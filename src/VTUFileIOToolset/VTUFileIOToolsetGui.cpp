@@ -61,7 +61,8 @@ void VTUFileIOToolsetGui::SaveDialog() {
 	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
 	fileDialog->setFileMode(QFileDialog::AnyFile);
 	fileDialog->setAcceptMode(QFileDialog::AcceptSave);
-	fileDialog->setNameFilters(QStringList("VTK Legacy"));
+	fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
+	//fileDialog->setNameFilters(QStringList("VTK Legacy(*.vtk)"));
 
 	QObject::connect(fileDialog, SIGNAL(SAMFileDialog::onFileSelected), NULL, SLOT(VTUFileIOCommand::CommitSave));
 	fileDialog->show();

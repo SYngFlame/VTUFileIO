@@ -10,6 +10,7 @@
           <li>SAMVTKFileIOFragment  /SAM内核数据访问核心
           <li>VTUElementHandler /SAM单元类型枚举方法
           <li>VTUFileManager    /SAM VTK数据中转
+          <li>VTUFileWriter /引用VTK库的数据写出方法
           <li>VTUFileIOPytMoudle
           <li>VTUIOUtils</li>
         </ul>
@@ -41,10 +42,10 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 |SAM单元|VTK单元|VTK单元类型编号|
 |:--------|:--------|:--------|
-|B31|VTK_LINE 3|![Line Cell](./Line.png)|
-|T3D2|VTK_LINE 3|![Line Cell](./Line.png)|
-|S3|VTK_TRIANGLE 5|![Triangle Cell](./Triangle.png)|
-|S4R|VTK_QUAD 9|![Quad Cell](./Rectangle.png)|
+|B31|VTK_LINE 3|![Line Cell](./pictures/Line.png)|
+|T3D2|VTK_LINE 3|![Line Cell](./pictures/Line.png)|
+|S3|VTK_TRIANGLE 5|![Triangle Cell](./pictures/Triangle.png)|
+|S4R|VTK_QUAD 9|![Quad Cell](./pictures/Rectangle.png)|
  
 在SAM和VTK中面单元的顶点顺序均为逆时针为正向，保持SAM中单元的`Connectivity`顺序即可保持法向量不变。
 
@@ -59,7 +60,7 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 1. 点击**File**->**Export**->**VTK Legacy..**；
 
 2. 在弹出文件浏览器选择VTK保存的位置，设置文件名称；
-![Export](./ExportUI.png)
+![Export](./pictures/ExportUI.png)
 
 3. 点击Save完成导出，
 当前视图下的模型将会导出到指定目录下。
@@ -81,7 +82,7 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 2. 通过文件浏览器窗口选取VTK文件，界面同Export模块；
 
 3. 通过弹窗确定插入Part，如图；
-![Import](./ImportUI.png)
+![Import](./pictures/ImportUI.png)
 
 ### 详细设计
 
@@ -91,7 +92,7 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 ### VTU支持
 
-`VTU`是**XML**化的**VTK**文件，相对经典的**VTK**文件`VTK Legacy`，`VTU`可以支持更多扩展的**VTK**类型数据。
+`VTU`是**XML**化的**VTK**文件，相对经典的VTK文件`VTK Legacy`，`VTU`可以支持更多VTK扩展的数据。
 
 ### 批量导出窗口
 
