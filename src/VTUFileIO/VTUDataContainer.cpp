@@ -16,11 +16,20 @@ void VTUDataContainer::InsertNextPoint(float x, float y, float z) {
 	points.push_back({ x,y,z });
 }
 
-int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet){
-	Element e;
-	if (e.type = VTUElementHandler::ConvertToVTKType(label) || (e.dataSet = dataSet) == NULL)
-		//TODO:ConvertToVTKType(const QString& label)
+int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet) {
+	if (dataSet == nullptr) {
 		return ERRORTYPE_WRONGELEMENTDATA;
-	else elems.push_back(e);
+	}
+
+	int type = VTUElementHandler::ConvertToVTKType(label);
+	if (type == 0) {
+		free(dataSet);
+		return ERRORTYPE_WRONGELEMENTDATA;
+	}
+
+	Element e;
+	e.type = type;
+	e.dataSet = dataSet;
+	elems.push_back(e);
 	return 0;
 }

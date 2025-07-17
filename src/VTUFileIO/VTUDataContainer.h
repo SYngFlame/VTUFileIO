@@ -1,3 +1,6 @@
+#ifndef VTU_DATA_CONTAINER_H
+#define VTU_DATA_CONTAINER_H
+
 #include <qvector.h>
 #include <VTUElementHandler.h>
 struct Point {
@@ -24,3 +27,5 @@ public:
 	VTUDataContainer();
 	~VTUDataContainer();
 };
+
+#endif // VTU_DATA_CONTAINER_H

@@ -6,6 +6,7 @@ int VTUElementHandler::ConvertToVTKType(const QString& typeLabel) {
 	if (typeLabel == "T3D2") return VTK_LINE;
 	if (typeLabel == "S3") return VTK_TRIANGLE;
 	if (typeLabel == "S4R") return VTK_QUAD;
+	return 0; // Return 0 for unsupported types
 }
 int VTUElementHandler::GetArrayLength(const QString& typeLabel) {
 	if (typeLabel == "B31") return 2;

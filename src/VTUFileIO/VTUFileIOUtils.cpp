@@ -39,3 +39,7 @@ extern "C" void initVTUFileIO(void)
 {
 	iniPythonModuleRegistrar::Instance().Register(VTUFileIOInitialize, VTUFileIOFinalize);
 }
+
+void SAMVTUFileIO_initialize()
+{
+}

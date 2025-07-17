@@ -17,6 +17,12 @@
 
 #include <ErrorHandler.h>
 
+#include <QFile> // 添加QFile头文件
+#include <QTextStream> // 添加QTextStream头文件
+#include <VTUDataContainer.h> // 添加VTUDataContainer头文件
+#include <VTKFileReader.h> // 添加VTKFileReader头文件
+#include <QDebug>  // 添加此行
+
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
 	{"printAll", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::printAll},
@@ -47,57 +53,61 @@ omuPrimitive* SAMVTUFileIOFragment::Copy() const
 
 omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 {
-	basBasis* bas = basBasis::Instance();
-	basMdb mdb = bas->Fetch();
-	basModelMap modelsMap = mdb.GetModels();
-	cowListString modelList = modelsMap.Keys();
-
-	for (int i = 0; i < modelList.Length(); ++i) {
-		QString s = modelList.Get(i);
-		qDebug(qPrintable(s));
-		const ptoKPartRepository& parts = ptoKConstGetPartRepos(mdb, s);
-		if (parts.IsEmpty()) return 0;
-		for (int p = 1; p <= parts.Size(); ++p) {
-			QString partname = parts.GetKey(p);
-			qDebug(qPrintable(partname));
-			
-			ptoKPart part = parts.ConstGet(p);
-			ftrFeatureList* flpart = part.GetFeatureList();
-
-			if (!flpart->MeshExists(bdoDefaultInstId)) continue;
-
-			const bmeMesh* objectMesh = flpart->ConstGetMesh(bdoDefaultInstId);
-			if (!objectMesh->NumNodes()) return 0;
-			const bmeNodeData& nodeData = objectMesh->NodeData();
-			utiCoordCont3D nodeContainer = nodeData.CoordContainer();
-			cowListInt nodeList;
-			nodeData.GetUserNodeLabels(nodeList);
-			for (int n = 0; n < nodeList.Length(); ++n) {
-				int userLabel = nodeList.ConstGet(n);
-				float x, y, z;
-				nodeContainer.GetCoord(nodeData.GetMeshNodeIndex(userLabel), x, y, z);
-
-				QString pointMsg = QString("Node Label %1 (%2 ,%3, %4)").
-						arg(userLabel).
-						arg(x, 8, 'f', 2, ' ').
-						arg(y, 8, 'f', 2, ' ').
-						arg(z, 8, 'f', 2, ' ');
-				qDebug(qPrintable(pointMsg));
-			}
-
-			const bmeElementData& elemData = objectMesh->ElementData();
-			const bmeElementClassList& elemClasses = elemData.ConstGetClasses();
-			for (int l = 0; l < elemClasses.Size(); ++l) {
-				const bmeElementClass& elemclass = elemClasses.ConstGet(l);
-				int index = elemclass.ClassIndex();
-				QString s_index = QString("element %1 class %2").arg(l).arg(index);
-				qDebug(qPrintable(s_index));
-				qDebug(qPrintable(elemclass.ElemTypeLabel()));
-			}
-		}
+	// 测试读取VTK文件 (临时代码)
+	QFile vtkFile("C:/Users/charlatan/Desktop/AAA/simple_line.vtk"); // 修改为你的测试文件路径
+	if (!vtkFile.exists()) {
+		qDebug() << "Test VTK file not found!";
+		return 0;
 	}
+
+	VTKFileReader reader(&vtkFile);
+	int error = reader.ReadVTK();
+	if (error) {
+		qDebug() << "Error reading VTK file:" << error;
+		ErrorHandler::ReportErr(error);
+		return 0;
+	}
+
+	VTUDataContainer& data = reader.GetDataContainer();
+
+	// 打印节点信息
+	qDebug() << "===== Nodes =====";
+	for (int i = 0; i < data.points.size(); ++i) {
+		const Point& p = data.points[i];
+		qDebug() << "Node" << i << ": (" << p.x << ", " << p.y << ", " << p.z << ")";
+	}
+
+	// 打印单元信息
+	qDebug() << "===== Elements =====";
+	for (int i = 0; i < data.elems.size(); ++i) {
+		const Element& e = data.elems[i];
+		QString elemType;
+		switch (e.type) {
+		case 3: elemType = "B31/LINE"; break;
+		case 5: elemType = "S3/TRI"; break;
+		case 9: elemType = "S4R/QUAD"; break;
+		default: elemType = "Unknown";
+		}
+
+		QString connStr = "Connections: ";
+		// 注意：这里我们使用Element的类型来获取节点数
+		int numNodes = VTUElementHandler::GetArrayLength(e.type);
+		for (int j = 0; j < numNodes; ++j) {
+			connStr += QString::number(e.dataSet[j]) + " ";
+		}
+
+		qDebug() << "Element" << i << ": Type:" << elemType << "-" << connStr;
+	}
+
+	// 临时添加: 打印统计信息
+	qDebug() << "===== Summary =====";
+	qDebug() << "Total Nodes:" << data.points.size();
+	qDebug() << "Total Elements:" << data.elems.size();
+
 	return 0;
 }
+
+
 omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 
 	QString path;
