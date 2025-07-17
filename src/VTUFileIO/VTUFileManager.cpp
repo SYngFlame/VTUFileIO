@@ -11,7 +11,8 @@
 #include <omuPrimType.h>
 #include <FEOdb.h>
 
-#include <VTUFileWriter.h>
+#include <VTUContainerWriter.h>
+#include <VTUFormatIO.h>
 #include <qfile.h>
 
 VTUFileManager::VTUFileManager() {
@@ -32,9 +33,19 @@ TargetList::TargetList() {
 const ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 
 	basBasis* bas = basBasis::Instance();
-
 	basMdb mdb = bas->Fetch();
+
 	return ptoKConstGetPartRepos(mdb, model);
+}
+
+const cowListString& VTUFileManager::GetAssemblyParts(const QString& model) {
+
+	basBasis* bas = basBasis::Instance();
+	basMdb mdb = bas->Fetch();
+	const basModelMap& models = mdb.ConstGetModels();
+
+	basNewModel cur_model = models.ConstGet(model);
+	return cur_model.ConstGetInstanceTable().Keys();
 }
 
 /*
@@ -51,7 +62,8 @@ int VTUFileManager::Init(const QString& path, const int& display, const QString&
 
 int VTUFileManager::WriteCache() {
 	
-	writer = new VTUFileWriter();
+	writer = new VTUContainerWriter();
+	fileWriter = new VTKLegacyFormatWriter(target.TargetPath(), writer->GetContainer());
 	switch (target.displayMode) {
 		case omu_PART: {
 			return writeSinglePart();
@@ -64,6 +76,10 @@ int VTUFileManager::WriteCache() {
 		}
 	}
 	return ERRORTYPE_WRONGSCENE;
+}
+
+int VTUFileManager::WriteFile() {
+	return fileWriter->Write(writer->GetContainer(), target.TargetPath());
 }
 
 int VTUFileManager::ReadTarget() {
@@ -79,11 +95,13 @@ int VTUFileManager::writeSinglePart() {
 
 int VTUFileManager::writeAllParts() {
 	const ptoKPartRepository& parts = GetModelParts(target.TargetModel());
+	const cowListString assmParts = GetAssemblyParts(target.TargetModel());
 	if (parts.IsEmpty())
 		return ERRORTYPE_NOTEXIST;
 	int status = 0;
 	for (int i = 1; i <= parts.Size(); ++i) {
-		status &= writer->GetVTKPart(parts.ConstGet(i));
+		if(assmParts.FindMember(assmParts.ConstGet(i)) != -1)
+			status &= writer->GetVTKPart(parts.ConstGet(i));
 	}
 	return status;
 }

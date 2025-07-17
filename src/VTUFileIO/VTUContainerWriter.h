@@ -9,7 +9,7 @@ class QFile;
 class bmeElementClass;
 class VTUDataContainer;
 
-class VTUFileWriter
+class VTUContainerWriter
 {
 
 private:
@@ -20,10 +20,12 @@ protected:
 
 public:
 	int GetVTKPart(const ptoKPart& part);
+	const VTUDataContainer& GetContainer();
 	int VTKExportODB();
+
 	//virtual int WriteFormat();
-	VTUFileWriter(QFile* file);
-	VTUFileWriter();
-	~VTUFileWriter();
+	VTUContainerWriter(QFile* file);
+	VTUContainerWriter();
+	~VTUContainerWriter();
 };
 

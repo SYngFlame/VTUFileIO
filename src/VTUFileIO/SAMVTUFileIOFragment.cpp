@@ -117,8 +117,7 @@ omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 	{
 		status = fileManager->Init(path, display, modelName, partName);
 		if (!(status = fileManager->WriteCache())) {
-			//fileManager->WriteFile();
-
+			fileManager->WriteFile();
 		}
 	}
 	else status &= ERRORTYPE_MEMORYALLOCFAILED;

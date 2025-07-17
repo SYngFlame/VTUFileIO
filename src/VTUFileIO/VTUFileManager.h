@@ -5,8 +5,8 @@
 #include <QtPlugin>
 #include <ptoKPartRepository.h>
 
-class VTUFileWriter;
-
+class VTUContainerWriter;
+class FormatWriter;
 
 enum omuObjectToDisplayTypeEnm;
 enum VTKType {
@@ -32,8 +32,10 @@ class VTUFileManager
 {
 private:
 	TargetList target;
-	VTUFileWriter* writer;
+	VTUContainerWriter* writer;
+	FormatWriter* fileWriter;
 
+	static const cowListString& GetAssemblyParts(const QString& model);
 	static const ptoKPartRepository& GetModelParts(const QString& model);
 	int VTUFileManager::writeSinglePart();
 	int VTUFileManager::writeAllParts();
@@ -45,6 +47,7 @@ public:
 
 	int Init(const QString& targetPath, const int& display, const QString& modelName, const QString& partName);
 	int WriteCache();
+	int WriteFile();
 	int ReadTarget();
 };
 

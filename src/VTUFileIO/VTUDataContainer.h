@@ -1,4 +1,5 @@
 #include <qvector.h>
+#include <qmap.h>
 #include <VTUElementHandler.h>
 struct Point {
 	float x;
@@ -17,8 +18,11 @@ public:
 
 	QVector<Point> points;
 	QVector<Element> elems;
+	QMap<int, int> Index2PositionMap;
 
-	void VTUDataContainer::InsertNextPoint(float x, float y, float z);
+	int elemVertices;
+
+	void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z);
 	int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet);
 
 	VTUDataContainer();

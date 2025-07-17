@@ -1,4 +1,4 @@
-#include "VTUFileWriter.h"
+#include "VTUContainerWriter.h"
 
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
@@ -10,17 +10,17 @@
 
 #include <qfile.h>
 
-VTUFileWriter::VTUFileWriter() {
+VTUContainerWriter::VTUContainerWriter() {
 	
 }
 
-VTUFileWriter::~VTUFileWriter() {
+VTUContainerWriter::~VTUContainerWriter() {
 
 }
 
-VTUFileWriter::VTUFileWriter(QFile* file) : file(file){}
+VTUContainerWriter::VTUContainerWriter(QFile* file) : file(file){}
 
-int VTUFileWriter::GetVTKPart(const ptoKPart& part) {
+int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
 	ftrFeatureList ftrlist = part.ConstGetFeatureList();
 	if (!(ftrlist.MeshExists(bdoDefaultInstId)))
 		return ERRORTYPE_NOTEXIST;
@@ -37,7 +37,7 @@ int VTUFileWriter::GetVTKPart(const ptoKPart& part) {
 	for (int n = 0; n < nodeList.Length(); ++n) {
 		float x, y, z;
 		nodeContainer.GetCoord(n, x, y, z);
-		VTKData.InsertNextPoint(x, y, z);
+		VTKData.InsertNextPoint(n, x, y, z);
 	}
 
 	int status = 0;
@@ -55,7 +55,7 @@ int VTUFileWriter::GetVTKPart(const ptoKPart& part) {
 				return ERRORTYPE_MEMORYALLOCFAILED;
 			const int* conn = elem.Connectivity();
 			for (int i = length * e; i < length * (e + 1); ++i) {
-				dataSet[i] = nodeData.GetMeshNodeIndex(conn[i]);
+				dataSet[i] = nodeData.GetMeshNodeIndex(VTKData.Index2PositionMap.value(conn[i]));
 			}
 			status &= VTKData.InsertNextElement(elem.ElemTypeLabel(), dataSet);
 		}
@@ -64,6 +64,10 @@ int VTUFileWriter::GetVTKPart(const ptoKPart& part) {
 	return status;
 }
 
-int VTUFileWriter::VTKExportODB() {
+const VTUDataContainer& VTUContainerWriter::GetContainer() {
+	return VTKData;
+}
+
+int VTUContainerWriter::VTKExportODB() {
 	return 0;
 }

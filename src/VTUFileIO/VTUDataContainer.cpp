@@ -9,11 +9,12 @@ VTUDataContainer::~VTUDataContainer() {
 }
 
 VTUDataContainer::VTUDataContainer() {
-
+	elemVertices = 0;
 }
 
-void VTUDataContainer::InsertNextPoint(float x, float y, float z) {
+void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z) {
 	points.push_back({ x,y,z });
+	Index2PositionMap.insert(index ,points.size() - 1);
 }
 
 int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet){
@@ -22,5 +23,6 @@ int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet){
 		//TODO:ConvertToVTKType(const QString& label)
 		return ERRORTYPE_WRONGELEMENTDATA;
 	else elems.push_back(e);
+	elemVertices += VTUElementHandler::GetArrayLength(e.type);
 	return 0;
 }
