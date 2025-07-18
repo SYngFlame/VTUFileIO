@@ -80,8 +80,6 @@ VTKLegacyFormatWriter::VTKLegacyFormatWriter(const QString& path, VTUDataContain
 	stream = new QTextStream(file);
 	stream->setRealNumberPrecision(8);
 	stream->setRealNumberNotation(QTextStream::SmartNotation);
-	stream->setNumberFlags(!QTextStream::ForcePoint);
-
 }
 
 int VTKLegacyFormatWriter::Write(const QString& path) {

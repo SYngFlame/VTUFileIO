@@ -45,7 +45,7 @@ void VTUFileIOToolsetGui::createMenuItems()
 	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
 	testMenu->addAction(printCmd);
 
-	SAMMenu* fileMenu = ubiFileToolsetGui::Instance().findChild<SAMMenu*>("fileMenu", Qt::FindChildrenRecursively);
+	SAMMenu* fileMenu = ubiFileToolsetGui::Instance().findChild<SAMMenu*>("&File", Qt::FindChildrenRecursively);
 	if (fileMenu == NULL) {
 		qDebug("Menu not found.");
 		return;
