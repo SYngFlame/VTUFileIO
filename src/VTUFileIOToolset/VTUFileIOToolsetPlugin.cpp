@@ -22,7 +22,7 @@ void VTUFileIOToolsetPlugin::registerToolset()
 	SAMMainWindow* mw = app->getSAMMainWindow();
 	if (mw->getModule("Part"))
 	{
-		mw->getModule("Part")->registerToolset(&VTUFileIOToolsetGui::Instance(), GUI_IN_MENUBAR | GUI_IN_TOOLBAR);
+		mw->getModule("Part")->registerToolset(new VTUFileIOToolsetGui, GUI_IN_MENUBAR | GUI_IN_TOOLBAR);
 	}
 
 }
