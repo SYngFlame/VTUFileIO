@@ -10,10 +10,11 @@
 #include <cmdGCommandDeliveryRole.h>
 #include <SAMFileDialog.h>
 
+#include <ubiFileToolsetGui.h>
+
 
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
-	: SAMToolsetGui("Test"),
-	omiSingleton<VTUFileIOToolsetGui>()
+	: SAMToolsetGui("Test")
 {
 	createMenuItems();
 	createToolboxItems();
@@ -40,15 +41,25 @@ void VTUFileIOToolsetGui::deactivate()
 
 void VTUFileIOToolsetGui::createMenuItems()
 {
-	//todo
-	SAMMenu* testMenu = new SAMMenu(this, tr("&VTKExport"));
-
+	SAMMenu* testMenu = new SAMMenu(this, tr("&VTKTest"));
 	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
-	SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, testMenu, tr("&Save as VTK"));
-	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, testMenu, tr("&Import a VTK file"));
 	testMenu->addAction(printCmd);
-	testMenu->addAction(SaveCmd);
-	testMenu->addAction(ImportCmd);
+
+	SAMMenu* fileMenu = ubiFileToolsetGui::Instance().findChild<SAMMenu*>("fileMenu", Qt::FindChildrenRecursively);
+	if (fileMenu == NULL) {
+		qDebug("Menu not found.");
+		return;
+	}
+
+	SAMMenu* ExportMenu = fileMenu->findChild<SAMMenu*>("Export", Qt::FindDirectChildrenOnly);
+	SAMMenu* ImportMenu = fileMenu->findChild<SAMMenu*>("Import", Qt::FindDirectChildrenOnly);
+
+	SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, fileMenu, tr("&VTU/VTK Legacy.."));
+	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, fileMenu, tr("&VTK part"));
+
+	
+	fileMenu->addAction(SaveCmd);
+	fileMenu->addAction(ImportCmd);
 	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
 	connect(SaveCmd, SIGNAL(triggered(bool)), this, SLOT(SaveDialog()));
 }

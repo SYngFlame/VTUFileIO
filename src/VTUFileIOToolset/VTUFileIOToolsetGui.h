@@ -9,8 +9,6 @@
 // Begin local includes
 
 #include <SAMToolsetGui.h>
-#include <omiSingleton.h>
-#include <omiSingleton.T>
 
 #include <mmgGRemoteModeInstaller.h>
 #include <mmgGModeInstaller.h>
@@ -26,10 +24,9 @@ class basBasis;
 // Class definition
 //
 
-class VTUFileIOToolsetGui : public SAMToolsetGui, public omiSingleton<VTUFileIOToolsetGui>
+class VTUFileIOToolsetGui : public SAMToolsetGui
 {
     Q_OBJECT
-    friend class omiSingleton<VTUFileIOToolsetGui>;
 public:
 
     // Constructor and destructor:
