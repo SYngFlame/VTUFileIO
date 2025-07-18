@@ -11,7 +11,7 @@
 
 class ErrorHandler{
 public:
-	static void ReportErr(int err);
+	static void ReportExportErr(int err);
 };
 
 #endif  ERRORHANDLER

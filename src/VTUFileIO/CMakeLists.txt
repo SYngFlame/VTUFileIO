@@ -82,11 +82,13 @@ target_link_libraries(VTUFileIO
     SAMSceneGraph
     SAMPrimaryObjects
     SAMKernel
-    ${LIBS_QT5_ROOT}/lib/*.lib
-    ${LIBS_PYTHON_ROOT}/libs/*.lib
-    ${LIBS_OC_ROOT}/lib/*.lib
-	${LIBS_SAMSDK_ROOT}/libs/*.lib
-	${PROJECT_SOURCE_DIR}/lib/*.lib
-    ${LIBS_VTK_ROOT}/lib/*.lib
+    Qt5Core.lib
+    Qt5Widgets.lib
+    Qt5Gui.lib
+    ${LIBS_PYTHON_ROOT}/libs/*
+    ${LIBS_OC_ROOT}/lib/*
+	${LIBS_SAMSDK_ROOT}/libs/*
+	${PROJECT_SOURCE_DIR}/lib/*
+    ${LIBS_VTK_ROOT}/lib/*
     libtcmalloc_minimal.lib
 )

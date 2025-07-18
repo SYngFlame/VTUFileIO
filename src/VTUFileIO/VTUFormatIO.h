@@ -26,8 +26,6 @@ enum State {
 class FormatWriter {
 public:
 	
-
-	FormatWriter();
 	~FormatWriter();
 
 protected:
@@ -49,7 +47,7 @@ protected:
 	int currentDataPerLine;  // 每行写入的数据点数
 
 public:
-	virtual int Write(const VTUDataContainer& data, const QString& path);
+	virtual int Write(const QString& path);
 	State GetCurrentState() const;
 
 	// 获取已写入节点数
@@ -66,8 +64,8 @@ public:
 
 class VTUFormatWriter : public FormatWriter {
 public:
-	VTUFormatWriter(const QString& path, const VTUDataContainer& VTKData);
-	int Write(const VTUDataContainer& data, const QString& path);
+	VTUFormatWriter(const QString& path, VTUDataContainer* VTKData);
+	int Write(const QString& path);
 };
 
 /*
@@ -77,8 +75,8 @@ public:
 
 class VTKLegacyFormatWriter : public FormatWriter {
 public:
-	VTKLegacyFormatWriter(const QString& path, const VTUDataContainer& VTKData);
-	int Write(const VTUDataContainer& data, const QString& path);
+	VTKLegacyFormatWriter(const QString& path, VTUDataContainer* VTKData);
+	int Write(const QString& path);
 
 	// 写入节点部分头
 	State WritePointsHeader();

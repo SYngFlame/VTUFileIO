@@ -10,6 +10,7 @@
 #include <cmdGCommandDeliveryRole.h>
 #include <SAMFileDialog.h>
 
+
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
 	: SAMToolsetGui("Test"),
 	omiSingleton<VTUFileIOToolsetGui>()
@@ -40,12 +41,14 @@ void VTUFileIOToolsetGui::deactivate()
 void VTUFileIOToolsetGui::createMenuItems()
 {
 	//todo
-	SAMMenu* testMenu = new SAMMenu(this, tr("&VTK"));
+	SAMMenu* testMenu = new SAMMenu(this, tr("&VTKExport"));
 
 	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
-	testMenu->addAction(printCmd);
 	SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, testMenu, tr("&Save as VTK"));
+	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, testMenu, tr("&Import a VTK file"));
+	testMenu->addAction(printCmd);
 	testMenu->addAction(SaveCmd);
+	testMenu->addAction(ImportCmd);
 	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
 	connect(SaveCmd, SIGNAL(triggered(bool)), this, SLOT(SaveDialog()));
 }
@@ -64,8 +67,8 @@ void VTUFileIOToolsetGui::SaveDialog() {
 	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
 	fileDialog->setFileMode(QFileDialog::AnyFile);
 	fileDialog->setAcceptMode(QFileDialog::AcceptSave);
-	fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
-	//fileDialog->setNameFilters(QStringList("VTK Legacy(*.vtk)"));
+	//fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
+	fileDialog->setNameFilters(QStringList("VTK Legacy(*.vtk)"));
 
 	QObject::connect(fileDialog, SIGNAL(onFileSelected(const QString&)), this, SLOT(OnSave(const QString&)));
 	fileDialog->show();

@@ -9,12 +9,14 @@
 #include <qfileinfo.h>
 
 FormatWriter::~FormatWriter() {
-	file->close();
-	delete(file);
-	delete(stream);
+	if (file != NULL) {
+		file->close();
+		delete(file);
+	}
+	if(stream != NULL) delete(stream);
 }
 
-int FormatWriter::Write(const VTUDataContainer& data, const QString& path) {
+int FormatWriter::Write(const QString& path) {
 	return 0;
 }
 
@@ -35,11 +37,14 @@ int FormatWriter::GetCellsWritten() const {
 * VTU
 */
 
-VTUFormatWriter::VTUFormatWriter(const QString& path, const VTUDataContainer& VTKData) {
+VTUFormatWriter::VTUFormatWriter(const QString& path, VTUDataContainer* VTKData) {
+
+	this->data = VTKData;
+
 	QString targetPath = path;
 	if (QFileInfo(path).suffix() != "vtu") targetPath = path + ".vtu";
 
-	QFile* file = new QFile(path);
+	QFile* file = new QFile(targetPath);
 	if (!file->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
 		delete file;
 		file = nullptr;
@@ -50,7 +55,7 @@ VTUFormatWriter::VTUFormatWriter(const QString& path, const VTUDataContainer& VT
 
 }
 
-int VTUFormatWriter::Write(const VTUDataContainer& data, const QString& path) {
+int VTUFormatWriter::Write(const QString& path) {
 	QString targetPath = path;
 	if (QFileInfo(path).suffix() == "vtu") targetPath = path + ".vtu";
 	return 0;
@@ -61,33 +66,51 @@ int VTUFormatWriter::Write(const VTUDataContainer& data, const QString& path) {
 * VTKLegacy
 */
 
-VTKLegacyFormatWriter::VTKLegacyFormatWriter(const QString& path, const VTUDataContainer& VTKData) {
+VTKLegacyFormatWriter::VTKLegacyFormatWriter(const QString& path, VTUDataContainer* VTKData) {
+
+	this->data = VTKData;
 	QString targetPath = path;
 	if (QFileInfo(path).suffix() != "vtk") targetPath = path + ".vtk";
 
-	QFile* file = new QFile(path);
+	file = new QFile(targetPath);
 	if (!file->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-		delete file;
-		file = nullptr;
+		file = NULL;
+		return;
 	}
-	else QTextStream* stream = new QTextStream(file);
+	stream = new QTextStream(file);
 	stream->setRealNumberPrecision(8);
-	stream->setRealNumberNotation(QTextStream::ScientificNotation);
+	stream->setRealNumberNotation(QTextStream::SmartNotation);
+	stream->setNumberFlags(!QTextStream::ForcePoint);
 
 }
 
-int VTKLegacyFormatWriter::Write(const VTUDataContainer& data, const QString& path) {
+int VTKLegacyFormatWriter::Write(const QString& path) {
 
-	if(file)
+	if (!file) return ERRORTYPE_NOTEXIST;
 	*stream << "# vtk DataFile Version 3.0\n";
 	*stream << "SAMModel Output" << "\n";
 	*stream << "ASCII\n";
 	*stream << "DATASET UNSTRUCTURED_GRID\n";
+	*stream << flush;
 
 	currentState = HeaderWritten;
 	currentState = WritePointsHeader();
+	*stream << flush;
 
+	currentState = WritePoints();
+	*stream << flush;
 
+	currentState = WriteCellsHeader();
+	*stream << flush;
+
+	currentState = WriteCells();
+	*stream << flush;
+
+	currentState = WriteCellTypesHeader();
+	*stream << flush;
+
+	currentState = WriteCellTypes();
+	*stream << flush;
 
 	return 0;
 }
@@ -119,13 +142,13 @@ State VTKLegacyFormatWriter::WritePoints() {
 }
 
 State VTKLegacyFormatWriter::WriteCellsHeader() {
-	if (currentState != PointsWriting) {
+	if (currentState != PointsWritten) {
 		return currentState;
 	}
 
 	*stream << "\nCELLS " << data->elems.size() << " " << data->elemVertices << "\n";
-	currentState = CellsWriting;
 	cellsWritten = 0;
+
 	return CellsWriting;
 }
 
@@ -135,15 +158,14 @@ State VTKLegacyFormatWriter::WriteCells() {
 	}
 
 	// 遍历每个单元
-	int index = 0;
 	for (int i = 0; i < data->elems.size(); i++) {
 		// 获取单元节点数
-		int numNodes = VTUElementHandler::GetArrayLength(data->elems[i].type);
+		int numNodes = VTUElementHandler::GetArrayLengthByEnum(data->elems[i].type);
 		*stream << numNodes;
 
 		// 写入节点索引
 		for (int j = 0; j < numNodes; j++) {
-			*stream << " " << data->elems[i].dataSet[index++];
+			*stream << " " << data->elems[i].dataSet[j];
 		}
 		*stream << "\n";
 	}
@@ -153,7 +175,7 @@ State VTKLegacyFormatWriter::WriteCells() {
 }
 
 State VTKLegacyFormatWriter::WriteCellTypesHeader() {
-	if (currentState != CellsWriting) {
+	if (currentState != CellsWritten) {
 		return currentState; // 必须先完成单元写入
 	}
 

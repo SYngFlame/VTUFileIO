@@ -19,6 +19,8 @@ VTUFileManager::VTUFileManager() {
 }
 
 VTUFileManager::~VTUFileManager() {
+	if (writer != NULL) delete(writer);
+	if (fileWriter != NULL) delete(fileWriter);
 }
 
 TargetList::TargetList() {
@@ -63,7 +65,6 @@ int VTUFileManager::Init(const QString& path, const int& display, const QString&
 int VTUFileManager::WriteCache() {
 	
 	writer = new VTUContainerWriter();
-	fileWriter = new VTKLegacyFormatWriter(target.TargetPath(), writer->GetContainer());
 	switch (target.displayMode) {
 		case omu_PART: {
 			return writeSinglePart();
@@ -79,7 +80,13 @@ int VTUFileManager::WriteCache() {
 }
 
 int VTUFileManager::WriteFile() {
-	return fileWriter->Write(writer->GetContainer(), target.TargetPath());
+
+	fileWriter = new VTKLegacyFormatWriter(target.TargetPath(), writer->GetContainerPointer());
+
+	return fileWriter->Write(target.TargetPath());
+	 
+	delete fileWriter;
+	delete writer;
 }
 
 int VTUFileManager::ReadTarget() {
@@ -101,7 +108,7 @@ int VTUFileManager::writeAllParts() {
 	int status = 0;
 	for (int i = 1; i <= parts.Size(); ++i) {
 		if(assmParts.FindMember(assmParts.ConstGet(i)) != -1)
-			status &= writer->GetVTKPart(parts.ConstGet(i));
+			status |= writer->GetVTKPart(parts.ConstGet(i));
 	}
 	return status;
 }

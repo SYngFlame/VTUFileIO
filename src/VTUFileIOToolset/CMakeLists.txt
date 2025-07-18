@@ -73,10 +73,12 @@ set_target_properties(VTUFileIOToolset PROPERTIES
     SUFFIX ".dll")
 
 target_link_libraries(VTUFileIOToolset
-    ${LIBS_QT5_ROOT}/lib/*.lib
-    ${LIBS_PYTHON_ROOT}/libs/*.lib
-    ${LIBS_OC_ROOT}/lib/*.lib
-	${LIBS_SAMSDK_ROOT}/libs/*.lib
+    Qt5Core.lib
+    Qt5Widgets.lib
+    Qt5Gui.lib
+    ${LIBS_PYTHON_ROOT}/libs/*
+    ${LIBS_OC_ROOT}/lib/*
+	${LIBS_SAMSDK_ROOT}/libs/*
     libtcmalloc_minimal
 )
 

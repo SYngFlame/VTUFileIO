@@ -7,11 +7,14 @@
 #include <qstringlist.h>
 #include <qstring.h>
 
-void ErrorHandler::ReportErr(int err) {
+void ErrorHandler::ReportExportErr(int err) {
 	//auto app = SAMApp::getSAMApp();
 	//auto mw = app->getSAMMainWindow();
 
 	QStringList warn;
+
+	cmdCWIP& Ins = cmdCWIP::Instance();
+	if (!err) Ins.Print("Export Finished");
 
 	if (err & ERRORTYPE_NOTEXIST) {
 		warn.append(QString("Target to export does not exist."));
@@ -34,7 +37,7 @@ void ErrorHandler::ReportErr(int err) {
 	if (err & ERRORTYPE_MEMORYALLOCFAILED) {
 		warn.append(QString("Error in allocating memory"));
 	}
-	cmdCWIP& Ins = cmdCWIP::Instance();
+	
 	for (int i = 0; i < warn.size(); ++i) {
 		Ins.Warning(warn[i]);
 	}

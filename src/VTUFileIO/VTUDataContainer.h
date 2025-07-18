@@ -1,13 +1,16 @@
 #include <qvector.h>
 #include <qmap.h>
 #include <VTUElementHandler.h>
+
+class shpShape;
+
 struct Point {
 	float x;
 	float y;
 	float z;
 };
 struct Element {
-	int type;
+	VTUElementHandler::VTKType type;
 	int* dataSet;
 };
 
@@ -23,7 +26,7 @@ public:
 	int elemVertices;
 
 	void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z);
-	int VTUDataContainer::InsertNextElement(const QString& label, int* dataSet);
+	int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* dataSet);
 
 	VTUDataContainer();
 	~VTUDataContainer();

@@ -112,15 +112,17 @@ omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 	args.End();
 
 	int status = 0;
-	fileManager = (VTUFileManager*)malloc(sizeof(VTUFileManager));
+	fileManager = new VTUFileManager;
 	if (fileManager != NULL)
 	{
 		status = fileManager->Init(path, display, modelName, partName);
-		if (!(status = fileManager->WriteCache())) {
+		if (!(status |= fileManager->WriteCache())) {
 			fileManager->WriteFile();
 		}
+		delete fileManager;
 	}
-	else status &= ERRORTYPE_MEMORYALLOCFAILED;
-	ErrorHandler::ReportErr(status);
+	else status |= ERRORTYPE_MEMORYALLOCFAILED;
+	ErrorHandler::ReportExportErr(status);
+	
 	return 0;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ErrorHandler.h>
-#include <VTUDataContainer.h>
 
 class QString;
 class ptoKPart;
@@ -12,20 +11,15 @@ class VTUDataContainer;
 class VTUContainerWriter
 {
 
-private:
-	VTUDataContainer VTKData;
-
-protected:
-	QFile* file;
+public:
+	VTUDataContainer* VTKData;
 
 public:
 	int GetVTKPart(const ptoKPart& part);
-	const VTUDataContainer& GetContainer();
+	VTUDataContainer* GetContainerPointer();
 	int VTKExportODB();
 
 	//virtual int WriteFormat();
-	VTUContainerWriter(QFile* file);
 	VTUContainerWriter();
 	~VTUContainerWriter();
 };
-

@@ -3,22 +3,22 @@
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
 #include <visKSceneManager.h>
+#include <VTUDataContainer.h>
 
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
+#include <shpShape.h>
 
 #include <qfile.h>
 
 VTUContainerWriter::VTUContainerWriter() {
-	
+	this->VTKData = new VTUDataContainer;
 }
 
 VTUContainerWriter::~VTUContainerWriter() {
-
+	if(VTKData != NULL) delete(this->VTKData);
 }
-
-VTUContainerWriter::VTUContainerWriter(QFile* file) : file(file){}
 
 int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
 	ftrFeatureList ftrlist = part.ConstGetFeatureList();
@@ -37,7 +37,7 @@ int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
 	for (int n = 0; n < nodeList.Length(); ++n) {
 		float x, y, z;
 		nodeContainer.GetCoord(n, x, y, z);
-		VTKData.InsertNextPoint(n, x, y, z);
+		VTKData->InsertNextPoint(n, x, y, z);
 	}
 
 	int status = 0;
@@ -47,24 +47,27 @@ int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
 	for (int l = 0; l < elemClasses.Size(); ++l) {
 		const bmeElementClass& elem = elemClasses.ConstGet(l);
 		//TODO:Mutiple elements in a single class.Correct the visit function.
-
-		int length = VTUElementHandler::GetArrayLength(elem.ElemTypeLabel());
+		const int* conn = elem.Connectivity();
+		VTUElementHandler::VTKType type = VTUElementHandler::SimplifiedConvertor(elem.ElemTypeLabel(), elem.Shape()->NumGeometryDimensions());
+		int length = VTUElementHandler::GetArrayLengthByEnum(type);
 		for (int e = 0; e < elem.NumElements(); ++e) {
-			int* dataSet = (int*)malloc(length * sizeof(int));
+			int* dataSet = new int [length];
 			if (dataSet == NULL) 
 				return ERRORTYPE_MEMORYALLOCFAILED;
-			const int* conn = elem.Connectivity();
+			
+			if (conn == NULL) return ERRORTYPE_WRONGELEMENTDATA;
 			for (int i = length * e; i < length * (e + 1); ++i) {
-				dataSet[i] = nodeData.GetMeshNodeIndex(VTKData.Index2PositionMap.value(conn[i]));
+				dataSet[i % length] = VTKData->Index2PositionMap.value(conn[i]);
 			}
-			status &= VTKData.InsertNextElement(elem.ElemTypeLabel(), dataSet);
+			status |= VTKData->InsertNextElement(type, dataSet);
+			
 		}
 	}
 
 	return status;
 }
 
-const VTUDataContainer& VTUContainerWriter::GetContainer() {
+VTUDataContainer* VTUContainerWriter::GetContainerPointer() {
 	return VTKData;
 }
 
