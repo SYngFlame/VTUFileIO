@@ -1,11 +1,15 @@
 #include <VTUDataContainer.h>
-#include <ErrorHandler.h>
+#include <MessageHandler.h>
 #include <qstring.h>
 #include <shpShape.h>
 
 VTUDataContainer::~VTUDataContainer() {
-	for (int i = 0; i < elems.size(); ++i) {
-		if (elems[i].dataSet != NULL) delete [] elems[i].dataSet;
+	int loop = elems.size();
+	for (int i = 0; i < loop; ++i) {
+		{
+			if (elems[i].dataSet != NULL) free(elems[i].dataSet);
+			elems[i].dataSet = NULL;
+		}
 	}
 }
 
@@ -21,7 +25,7 @@ void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z) {
 int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* dataSet){
 	Element e;
 	if (!(e.type = type) || (e.dataSet = dataSet) == NULL)
-		return ERRORTYPE_WRONGELEMENTDATA;
+		return ERRORTYPE_WRONG_ELEMENT_DATA;
 	if (type == VTUElementHandler::VTK_VOXEL) {
 		int temp;
 		temp = dataSet[2];

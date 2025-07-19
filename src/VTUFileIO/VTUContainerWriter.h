@@ -1,6 +1,7 @@
-#pragma once
+#ifndef VTUCONTAINERWRITER
+#define VTUCONTAINERWRITER
 
-#include <ErrorHandler.h>
+#include <MessageHandler.h>
 
 class QString;
 class ptoKPart;
@@ -13,13 +14,16 @@ class VTUContainerWriter
 
 public:
 	VTUDataContainer* VTKData;
+	
+	VTUContainerWriter();
+	~VTUContainerWriter();
 
-public:
-	int GetVTKPart(const ptoKPart& part);
+	int GetVTKPart(ptoKPart part);
 	VTUDataContainer* GetContainerPointer();
 	int VTKExportODB();
 
 	//virtual int WriteFormat();
-	VTUContainerWriter();
-	~VTUContainerWriter();
+	
 };
+
+#endif // !VTUCONTAINERWRITER

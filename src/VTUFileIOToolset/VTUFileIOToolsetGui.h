@@ -54,8 +54,12 @@ private:
     
 private slots:
     void PrintMsg();
+
     void SaveDialog();
     void OnSave(const QString& path);
+
+    void OpenDialog();
+    void OnOpen(const QString& path);
 };
 
 #endif

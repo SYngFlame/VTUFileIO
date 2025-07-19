@@ -1,9 +1,10 @@
 #include <SAMVTUFileIOFragment.h>
 
-#include <gdyScene.h>
-#include <gdyEditor.h>
-#include <cowList.T>
+//#include <gdyScene.h>
+//#include <gdyEditor.h>
+//#include <cowList.T>
 
+#include <ptoKPartRepository.h>
 #include <ptoKUtils.h>
 #include <ptoKPart.h> 
 #include <ftrFeatureList.h>
@@ -15,12 +16,13 @@
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
 
-#include <ErrorHandler.h>
+#include <MessageHandler.h>
 
 static omuInterfaceObj::methodTable SAMVTUFileIOFMethods[] =
 {
 	{"printAll", (omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::printAll},
-	{"initManager",(omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::initManager},
+	{"initWriteManager",(omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::initWriteManager},
+	{"initReadManager",(omuInterfaceObj::methodFunc)&SAMVTUFileIOFragment::initReadManager},
 	{ 0, 0 }
 };
 
@@ -30,14 +32,14 @@ static omuInterfaceObj::memberTable SAMVTUFileIOFMembers[] =
 };
 
 SAMVTUFileIOFragment::SAMVTUFileIOFragment()
-	: ptsKPartFragment()
+	: ptsKModelFragment()
 {
 	omuInterfaceObj::DescribeType("SAMVTUFileIOFragment", SAMVTUFileIOFMethods, SAMVTUFileIOFMembers);
 	fileManager = NULL;
 }
 SAMVTUFileIOFragment::~SAMVTUFileIOFragment()
 {
-	if (fileManager != NULL) free(fileManager);
+	if (fileManager != NULL) delete(fileManager);
 }
 
 omuPrimitive* SAMVTUFileIOFragment::Copy() const
@@ -98,7 +100,7 @@ omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 	}
 	return 0;
 }
-omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
+omuPrimitive* SAMVTUFileIOFragment::initWriteManager(omuArguments& args) {
 
 	QString path;
 	int display;
@@ -115,14 +117,42 @@ omuPrimitive* SAMVTUFileIOFragment::initManager(omuArguments& args) {
 	fileManager = new VTUFileManager;
 	if (fileManager != NULL)
 	{
-		status = fileManager->Init(path, display, modelName, partName);
+		fileManager->Init(path, display, modelName, partName);
 		if (!(status |= fileManager->WriteCache())) {
 			fileManager->WriteFile();
 		}
 		delete fileManager;
 	}
-	else status |= ERRORTYPE_MEMORYALLOCFAILED;
-	ErrorHandler::ReportExportErr(status);
+	else status |= ERRORTYPE_MEMORY_ALLOC_FAILED;
+	MessageHandler::ReportExportErr(status);
 	
+	return 0;
+}
+
+omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
+
+	QString path;
+	QString modelName;
+
+	args.Begin();
+	args.Get(path);
+	args.Get(modelName);
+	args.End();
+
+	int status = 0;
+	fileManager = new VTUFileManager;
+	if (fileManager != NULL)
+	{
+		fileManager->Init(path, modelName);
+		if (!(status |= fileManager->ReadToCache())) {
+			fileManager->ReadToSAM();
+		}
+		delete fileManager;
+	}
+	else status |= ERRORTYPE_MEMORY_ALLOC_FAILED;
+
+	//TODO:Complete error report
+	MessageHandler::ReportImportErr(status);
+
 	return 0;
 }

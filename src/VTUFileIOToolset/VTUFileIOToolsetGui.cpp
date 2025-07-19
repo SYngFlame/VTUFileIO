@@ -44,7 +44,9 @@ void VTUFileIOToolsetGui::createMenuItems()
 	SAMMenu* testMenu = new SAMMenu(this, tr("&VTKTest"));
 	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
 	testMenu->addAction(printCmd);
+	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
 
+	/*
 	SAMMenu* fileMenu = ubiFileToolsetGui::Instance().findChild<SAMMenu*>("&File", Qt::FindChildrenRecursively);
 	if (fileMenu == NULL) {
 		qDebug("Menu not found.");
@@ -53,15 +55,20 @@ void VTUFileIOToolsetGui::createMenuItems()
 
 	SAMMenu* ExportMenu = fileMenu->findChild<SAMMenu*>("Export", Qt::FindDirectChildrenOnly);
 	SAMMenu* ImportMenu = fileMenu->findChild<SAMMenu*>("Import", Qt::FindDirectChildrenOnly);
+	*/
 
-	SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, fileMenu, tr("&VTU/VTK Legacy.."));
-	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, fileMenu, tr("&VTK part"));
+	SAMMenuCommand* SaveVTKCmd = new SAMMenuCommand(this, testMenu, tr("&VTK Legacy.."));
+	testMenu->addAction(SaveVTKCmd);
 
+	//SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, fileMenu, tr("&VTU.."));
+	//fileMenu->addAction(SaveVTUCmd);
+
+	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, testMenu, tr("&Import VTK Part"));
+	testMenu->addAction(ImportCmd);
 	
-	fileMenu->addAction(SaveCmd);
-	fileMenu->addAction(ImportCmd);
-	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
-	connect(SaveCmd, SIGNAL(triggered(bool)), this, SLOT(SaveDialog()));
+	
+	connect(SaveVTKCmd, SIGNAL(triggered(bool)), this, SLOT(SaveDialog()));
+	connect(ImportCmd, SIGNAL(triggered(bool)), this, SLOT(OpenDialog()));
 }
 
 void VTUFileIOToolsetGui::createToolboxItems()
@@ -87,4 +94,20 @@ void VTUFileIOToolsetGui::SaveDialog() {
 
 void VTUFileIOToolsetGui::OnSave(const QString& path) {
 	VTUFileIOCommand::CommitSave(path);
+}
+
+void VTUFileIOToolsetGui::OpenDialog() {
+
+	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
+	fileDialog->setFileMode(QFileDialog::AnyFile);
+	fileDialog->setAcceptMode(QFileDialog::AcceptOpen);
+	//fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
+	fileDialog->setNameFilters(QStringList("VTK Legacy(*.vtk)"));
+
+	QObject::connect(fileDialog, SIGNAL(onFileSelected(const QString&)), this, SLOT(OnOpen(const QString&)));
+	fileDialog->show();
+}
+
+void VTUFileIOToolsetGui::OnOpen(const QString& path) {
+	VTUFileIOCommand::CommitOpen(path);
 }

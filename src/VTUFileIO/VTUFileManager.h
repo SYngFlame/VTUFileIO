@@ -1,12 +1,14 @@
-#pragma once
+#ifndef VTUFILEMANAGER
+#define VTUFILEMANAGER
 
-#include <ErrorHandler.h>
-
-#include <QtPlugin>
 #include <ptoKPartRepository.h>
+#include <QtPlugin>
 
 class VTUContainerWriter;
+class VTUContainerReader;
 class FormatWriter;
+class FormatReader;
+class QString;
 
 enum omuObjectToDisplayTypeEnm;
 enum VTKType {
@@ -33,10 +35,13 @@ class VTUFileManager
 private:
 	TargetList target;
 	VTUContainerWriter* writer;
+	VTUContainerReader* reader;
 	FormatWriter* fileWriter;
+	FormatReader* fileReader;
 
 	static const cowListString& GetAssemblyParts(const QString& model);
-	static const ptoKPartRepository& GetModelParts(const QString& model);
+	static ptoKPartRepository& GetModelParts(const QString& model);
+	static const ptoKPartRepository& ConstGetModelParts(const QString& model);
 	int VTUFileManager::writeSinglePart();
 	int VTUFileManager::writeAllParts();
 	int VTUFileManager::writeODB();
@@ -45,9 +50,12 @@ public:
 	VTUFileManager();
 	virtual ~VTUFileManager();
 
-	int Init(const QString& targetPath, const int& display, const QString& modelName, const QString& partName);
+	void Init(const QString& targetPath, const int& display, const QString& modelName, const QString& partName);
+	void Init(const QString& targetPath, const QString& modelName);
 	int WriteCache();
 	int WriteFile();
-	int ReadTarget();
+	int ReadToCache();
+	int ReadToSAM();
 };
 
+#endif // !VTUFILEMANAGER

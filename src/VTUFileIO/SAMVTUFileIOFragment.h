@@ -3,7 +3,7 @@
 #define SAMVTUFileIOFragment_h
 
 #include <VTUFileIOUtils.h>
-#include <ptsKPartFragment.h>
+#include <ptsKModelFragment.h>
 #include <g3dVector.h>
 
 #include <VTUFileManager.h>
@@ -12,7 +12,7 @@ class omuArguments;
 
 // Class definition
 
-class SAMVTUFileIOFragment : public ptsKPartFragment
+class SAMVTUFileIOFragment : public ptsKModelFragment
 {
 private:
 	VTUFileManager* fileManager;
@@ -23,7 +23,8 @@ public:
 	omuPrimitive* Copy() const;
 
 	omuPrimitive* printAll(omuArguments& args);
-	omuPrimitive* initManager(omuArguments& args);
+	omuPrimitive* initWriteManager(omuArguments& args);
+	omuPrimitive* initReadManager(omuArguments& args);
 };
 
 #endif  // #ifdef SAMVTUFileIOFragment_h

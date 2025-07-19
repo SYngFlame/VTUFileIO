@@ -17,17 +17,17 @@ VTUContainerWriter::VTUContainerWriter() {
 }
 
 VTUContainerWriter::~VTUContainerWriter() {
-	if(VTKData != NULL) delete(this->VTKData);
+
 }
 
-int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
-	ftrFeatureList ftrlist = part.ConstGetFeatureList();
-	if (!(ftrlist.MeshExists(bdoDefaultInstId)))
+int VTUContainerWriter::GetVTKPart(ptoKPart part) {
+	ftrFeatureList* ftrlist = part.GetFeatureList();
+	if (!(ftrlist->MeshExists(bdoDefaultInstId)))
 		return ERRORTYPE_NOTEXIST;
 
-	bmeMesh* mesh = ftrlist.GetMesh(bdoDefaultInstId);
+	bmeMesh* mesh = ftrlist->GetMesh(bdoDefaultInstId);
 	if (!(mesh->NumNodes())) 
-		return ERRORTYPE_WRONGNODEDATA;
+		return ERRORTYPE_WRONG_NODE_DATA;
 
 	const bmeNodeData& nodeData = mesh->NodeData();
 	utiCoordCont3D nodeContainer = nodeData.CoordContainer();
@@ -51,11 +51,11 @@ int VTUContainerWriter::GetVTKPart(const ptoKPart& part) {
 		VTUElementHandler::VTKType type = VTUElementHandler::SimplifiedConvertor(elem.ElemTypeLabel(), elem.Shape()->NumGeometryDimensions());
 		int length = VTUElementHandler::GetArrayLengthByEnum(type);
 		for (int e = 0; e < elem.NumElements(); ++e) {
-			int* dataSet = new int [length];
+			int* dataSet = (int*)malloc(length * sizeof(int));
 			if (dataSet == NULL) 
-				return ERRORTYPE_MEMORYALLOCFAILED;
+				return ERRORTYPE_MEMORY_ALLOC_FAILED;
 			
-			if (conn == NULL) return ERRORTYPE_WRONGELEMENTDATA;
+			if (conn == NULL) return ERRORTYPE_WRONG_ELEMENT_DATA;
 			for (int i = length * e; i < length * (e + 1); ++i) {
 				dataSet[i % length] = VTKData->Index2PositionMap.value(conn[i]);
 			}

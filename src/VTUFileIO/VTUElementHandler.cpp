@@ -67,10 +67,46 @@ int VTUElementHandler::GetArrayLengthByEnum(VTKType typeEnum) {
 			return 2;
 		case VTK_TRIANGLE: 
 			return 3;
-		case VTK_QUAD:
+		case VTK_PIXEL:case VTK_QUAD:
 			return 4;
-		case VTK_VOXEL:
+		case VTK_VOXEL:case VTK_HEXAHEDRON:
 			return 8;
 	}
 	return 0;
+}
+
+/*
+* Return QString type of SAM elements type label.
+* For beams, return B31 when beamType=0, B33 when 1, T3D2 when 2.
+* For cubes, return C3D8 when cubeType=0, C3D8R when 1.
+* For quads, return S4 when quadType=0, S4I when 1, S4R when 2.
+*/
+QString VTUElementHandler::GetSAMTypeByVTKType(VTKType typeEnum, int beamType, int cubeType, int quadType) {
+	switch (typeEnum)
+	{
+		case VTK_NONE:
+			return "";
+		case VTK_VERTEX:
+			return "";
+		case VTK_POLYVERTEX:
+			return "";
+		case VTK_LINE:
+			return beamType ? (beamType ==1 ? "B33" : "T3D2") : "B31";
+		case VTK_TRIANGLE:
+			return "S3";
+		case VTK_TRIANGLE_STRIP:
+			return "";
+		case VTK_POLYGON:
+			return "";
+		case VTK_PIXEL:case VTK_QUAD:
+			return quadType ? (quadType == 1 ? "S4I" : "S4R") : "S4";
+		case VTK_TETRA:
+			return "";
+		case VTK_VOXEL:
+			return cubeType ? "C3D8R" : "C3D8";
+		case VTK_HEXAHEDRON:
+			return "";
+		default:
+			return "";
+	}
 }
