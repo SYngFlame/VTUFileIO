@@ -11,6 +11,10 @@
 #include <basMdb.h>
 #include <basBasis.h>
 #include <basNewModel.h>
+//#include <ptoKPartShortcut.h>
+//#include <ftrPrimaryObjShortcut.h>
+//#include <sesKSessionState.h>
+//#include <smgSceneManagerRole.h>
 
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
@@ -147,15 +151,20 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 		fileManager->Init(path, modelName);
 		if (!(status |= fileManager->ReadToCache())) {
 			status |= fileManager->ReadToSAM();
-			fileManager->SyncSAM(modelShortcut);
+			//fileManager->SyncSAM(modelShortcut);
+			/*smgSceneManagerRole& role = smgSceneManagerRole::TheSceneManagerRole();
+			role.UpdateDisplay(smg_Part, true);
+			role.Refresh();
+
+			ptoKPartReposInModelShortcut reposInModelSC(modelShortcut);
+			ptoKPartReposShortcut reposSC(reposInModelSC);
+			ptoKPartInReposShortcut inReposSC(reposSC, "chair", 1);
+			ftrPrimaryObjShortcut sc(inReposSC);*/
 		}
 		delete fileManager;
 	}
 	else status |= ERRORTYPE_MEMORY_ALLOC_FAILED;
 
-	auto role = ptsKSceneManager::TheInstance();
-	role->UpdateDisplay();
-	role->Refresh();
 	//TODO:Complete error report
 	MessageHandler::ReportImportErr(status);
 	return 0;

@@ -9,6 +9,7 @@
 #include <omuPrimType.h>
 #include <ptoKPartShortcut.h>
 #include <ftrPrimaryObjShortcut.h>
+#include <sesKSessionState.h>
 
 #include <VTUContainerWriter.h>
 #include <VTUContainerReader.h>
@@ -151,13 +152,13 @@ int VTUFileManager::writeSinglePart() {
 }
 
 int VTUFileManager::writeAllParts() {
-	const ptoKPartRepository parts = ConstGetModelParts(target.TargetModel());
-	const cowListString assmParts = GetAssemblyParts(target.TargetModel());
+	const ptoKPartRepository& parts = ConstGetModelParts(target.TargetModel());
+	//const cowListString& assmParts = GetAssemblyParts(target.TargetModel());
 	if (parts.IsEmpty())
 		return ERRORTYPE_NOTEXIST;
 	int status = 0;
 	for (int i = 1; i <= parts.Size(); ++i) {
-		if(assmParts.FindMember(parts.GetKey(i)) != -1)
+		//if(assmParts.FindMember(parts.GetKey(i)) != -1)
 			status |= writer->GetVTKPart(parts.ConstGet(i));
 	}
 	return status;
