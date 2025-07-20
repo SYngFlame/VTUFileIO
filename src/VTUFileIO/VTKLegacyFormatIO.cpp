@@ -259,6 +259,7 @@ VTKLegacyFormatReader::VTKLegacyFormatReader(const QString& path, VTUDataContain
 	stream = new QTextStream(file);
 	nodesRead = 0;
 	cellsRead = 0;
+	status = 0;
 }
 
 int VTKLegacyFormatReader::Read() {
@@ -289,9 +290,16 @@ int VTKLegacyFormatReader::Read() {
 	if (!dataset.startsWith("DATASET UNSTRUCTURED_GRID")) {
 		return ERRORTYPE_FILE_READ_FAILED;
 	}
+	QString version = versionLine.split(' ', QString::SkipEmptyParts)[4];
+	if (version == "3.0")
+		return Read30();
+	else if (version == "5.1")
+		return Read51();
+	else
+		return ERRORTYPE_FILE_READ_FAILED;
+}
 
-	status |= 1;
-
+int VTKLegacyFormatReader::Read30() {
 	while (!stream->atEnd()) {
 		QString line = stream->readLine().trimmed();
 
@@ -303,7 +311,7 @@ int VTKLegacyFormatReader::Read() {
 			if (!ok) return ERRORTYPE_WRONG_NODE_DATA;
 
 			if (parts[2] == "float" || parts[2] == "double" || parts[2] == "int" || parts[2] == "long")
-			status |= ReadPoints(numPoints);
+				status |= ReadPoints(numPoints);
 		}
 		else if (line.startsWith("CELLS")) {
 			QStringList parts = line.split(' ', QString::SkipEmptyParts);
@@ -311,7 +319,7 @@ int VTKLegacyFormatReader::Read() {
 			bool ok;
 			int numCells = parts[1].toInt(&ok);
 			if (!ok) return ERRORTYPE_WRONG_ELEMENT_DATA;
-			status |= ReadCells(numCells);
+			status |= ReadCells30(numCells);
 
 		}
 		else if (line.startsWith("CELL_TYPES")) {
@@ -325,8 +333,35 @@ int VTKLegacyFormatReader::Read() {
 	}
 
 	//state |= ReadMaterials();
-	if ((status & 1) && (status & 2)) return 0;
-	else return ERRORTYPE_FILE_READ_FAILED;
+	return status;
+}
+
+int VTKLegacyFormatReader::Read51() {
+	while (!stream->atEnd()) {
+		QString line = stream->readLine().trimmed();
+
+		if (line.startsWith("POINTS")) {
+			QStringList parts = line.split(' ', QString::SkipEmptyParts);
+			if (parts.size() < 2) return ERRORTYPE_WRONG_NODE_DATA;
+			bool ok;
+			int numPoints = parts[1].toInt(&ok);
+			if (!ok) return ERRORTYPE_WRONG_NODE_DATA;
+
+			if (parts[2] == "float" || parts[2] == "double" || parts[2] == "int" || parts[2] == "long")
+				status |= ReadPoints(numPoints);
+		}
+		else if (line.startsWith("CELLS")) {
+			QStringList parts = line.split(' ', QString::SkipEmptyParts);
+			if (parts.size() < 2) return ERRORTYPE_WRONG_ELEMENT_DATA;
+			bool ok;
+			int numOffsets = parts[1].toInt(&ok);
+			if (!ok) return ERRORTYPE_WRONG_ELEMENT_DATA;
+			status |= ReadCells51(numOffsets);
+		}
+	}
+
+	//state |= ReadMaterials();
+	return status;
 }
 
 int VTKLegacyFormatReader::ReadPoints(int numPoints) {
@@ -340,10 +375,10 @@ int VTKLegacyFormatReader::ReadPoints(int numPoints) {
 
 		++nodesRead;
 	}
-	return 1;
+	return 0;
 }
 
-int VTKLegacyFormatReader::ReadCells(int numCells) {
+int VTKLegacyFormatReader::ReadCells30(int numCells) {
 
 	data->elems.resize(numCells);
 
@@ -373,24 +408,54 @@ int VTKLegacyFormatReader::ReadCells(int numCells) {
 		data->elems[i].dataSet = conn;
 		++cellsRead;
 	}
-	return 1 << 1;
+	return 0;
+}
+
+int VTKLegacyFormatReader::ReadCells51(int numOffsets) {
+	data->elems.resize(numOffsets - 1);
+	int* offsets = (int*)malloc(numOffsets * sizeof(int));
+	if (!offsets) return ERRORTYPE_MEMORY_ALLOC_FAILED;
+	while (!stream->atEnd()) {
+		QString line = stream->readLine().trimmed();
+		
+		
+		if (line.startsWith("OFFSETS")) {
+			for (int i = 0; i < numOffsets; ++i) {
+				*stream >> offsets[i];
+			}
+		}
+		else if (line.startsWith("CONNECTIVITY")) {
+			for (int i = 0; i < numOffsets - 1; ++i) {
+
+				// Copy element connectivity
+				int distance = offsets[i + 1] - offsets[i];
+				int* conn = (int*)malloc(sizeof(int) * distance);
+				if (!conn) return ERRORTYPE_MEMORY_ALLOC_FAILED;
+				for (int j = 0; j < distance; ++j) {
+					*stream >> conn[j];
+				}
+				// Add to data container
+				data->elems[i].dataSet = conn;
+				++cellsRead;
+			}
+
+		}
+		else if (line.startsWith("CELL_TYPES")) {
+			if (ReadCellTypes(numOffsets - 1))
+				return ERRORTYPE_WRONG_ELEMENT_DATA;
+		}
+	}
+	free(offsets);
+	return 0;
 }
 
 int VTKLegacyFormatReader::ReadCellTypes(int numTypes) {
 	data->elems.resize(numTypes);
 	for (int i = 0; i < numTypes; ++i) {
-
-		if (stream->atEnd()) return ERRORTYPE_WRONG_ELEMENT_DATA;
-		QString line = stream->readLine();
-		if (line.isEmpty()) continue;
-		bool ok;
-		
-		if (line.size() >  1) {
-			return ERRORTYPE_WRONG_ELEMENT_DATA;
-		}
-
+		int type;
+		*stream >> type;
 		// Add to data container
-		data->elems[i].type = (VTUElementHandler::VTKType)line.toInt(&ok);
+		data->elems[i].type = (VTUElementHandler::VTKType)type;
 	}
-	return 1 << 2;
+	return 0;
 }

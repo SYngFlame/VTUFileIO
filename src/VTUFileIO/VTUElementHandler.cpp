@@ -105,7 +105,7 @@ QString VTUElementHandler::GetSAMTypeByVTKType(VTKType typeEnum, int beamType, i
 		case VTK_VOXEL:
 			return cubeType ? "C3D8R" : "C3D8";
 		case VTK_HEXAHEDRON:
-			return "";
+			return cubeType ? "C3D8R" : "C3D8";
 		default:
 			return "";
 	}

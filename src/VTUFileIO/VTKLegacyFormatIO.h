@@ -59,12 +59,15 @@ public:
 	VTKLegacyFormatReader(const QString& path, VTUDataContainer* VTKData);
 
 	int Read();
+	int Read30();
+	int Read51();
 
 	// 读入节点坐标
 	int ReadPoints(int numPoints);
 
 	// 读入一批单元数据
-	int ReadCells(int numCells);
+	int ReadCells30(int numCells);
+	int ReadCells51(int numOffsetls);
 
 	int ReadCellTypes(int numTypes);
 

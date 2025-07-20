@@ -15,6 +15,7 @@
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
+#include <ptsKSceneManager.h>
 
 #include <MessageHandler.h>
 
@@ -152,6 +153,9 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 	}
 	else status |= ERRORTYPE_MEMORY_ALLOC_FAILED;
 
+	auto role = ptsKSceneManager::TheInstance();
+	role->UpdateDisplay();
+	role->Refresh();
 	//TODO:Complete error report
 	MessageHandler::ReportImportErr(status);
 	return 0;
