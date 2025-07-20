@@ -3,6 +3,7 @@
 
 #include <ptoKPartRepository.h>
 #include <MessageHandler.h>
+#include <qvector.h>
 
 class QString;
 class bmeElementClass;
@@ -14,14 +15,16 @@ class VTUContainerReader
 
 private:
 	VTUDataContainer* VTKData;
-	ptoKPart* targetPart;
+	QVector<int*> VTUHeap;
+	QVector<bmeElementClass*> VTUFree;
 
 public:
 	VTUContainerReader(VTUDataContainer* container);
 	~VTUContainerReader();
 	
-	int ConstructNewPart(ptoKPartRepository& parts, const QString& partName);
-	int ConstructElemClasses(bmeElementClass**& classes);
+	int ConstructNewPart(const QString& modelName, QString& partName, int& partID);
+	int ConstructElemClasses(bmeElementClass*** classes, int* numCls);
+	void ReleaseMemory();
 	
 
 	VTUDataContainer* GetContainerPointer();

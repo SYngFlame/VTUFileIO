@@ -82,7 +82,7 @@ void VTUFileIOToolsetGui::PrintMsg() {
 
 void VTUFileIOToolsetGui::SaveDialog() {
 	
-	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
+	fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
 	fileDialog->setFileMode(QFileDialog::AnyFile);
 	fileDialog->setAcceptMode(QFileDialog::AcceptSave);
 	//fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
@@ -94,11 +94,13 @@ void VTUFileIOToolsetGui::SaveDialog() {
 
 void VTUFileIOToolsetGui::OnSave(const QString& path) {
 	VTUFileIOCommand::CommitSave(path);
+	//delete fileDialog;
+	fileDialog = NULL;
 }
 
 void VTUFileIOToolsetGui::OpenDialog() {
 
-	SAMFileDialog* fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
+	fileDialog = new SAMFileDialog("Select existing directory for VTK files", 0);
 	fileDialog->setFileMode(QFileDialog::AnyFile);
 	fileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 	//fileDialog->setNameFilters(QStringList("VTK XML Unstructured Grid(*.vtu)"));
@@ -110,4 +112,7 @@ void VTUFileIOToolsetGui::OpenDialog() {
 
 void VTUFileIOToolsetGui::OnOpen(const QString& path) {
 	VTUFileIOCommand::CommitOpen(path);
+	// TODO: Whether to delete fileDialog?
+	// delete fileDialog;
+	fileDialog = NULL;
 }

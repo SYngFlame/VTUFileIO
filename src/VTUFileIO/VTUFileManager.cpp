@@ -7,6 +7,8 @@
 #include <basBasis.h>
 #include <basNewModel.h>
 #include <omuPrimType.h>
+#include <ptoKPartShortcut.h>
+#include <ftrPrimaryObjShortcut.h>
 
 #include <VTUContainerWriter.h>
 #include <VTUContainerReader.h>
@@ -51,8 +53,10 @@ ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 
 	basBasis* bas = basBasis::Instance();
 	basMdb mdb = bas->Fetch();
-
-	return ptoKGetPartRepos(mdb, model);
+	basModelMap& mdoelMap = mdb.GetModels();
+	basNewModel& targetModel = mdoelMap.Get(model);
+	
+	return dynamic_cast<ptoKPartRepository&>(targetModel.GetPart());
 }
 
 const cowListString& VTUFileManager::GetAssemblyParts(const QString& model) {
@@ -115,7 +119,8 @@ int VTUFileManager::ReadToCache() {
 
 int VTUFileManager::ReadToSAM() {
 	
-	int status = reader->ConstructNewPart(GetModelParts(target.TargetModel()), QFileInfo(target.TargetPath()).fileName());
+	int status = reader->ConstructNewPart(target.TargetModel(), QFileInfo(target.TargetPath()).baseName(), target.targetPartID);
+	//reader->ReleaseMemory();
 	delete reader;
 	delete writer;
 	writer = NULL;
@@ -162,6 +167,13 @@ int VTUFileManager::writeODB() {
 	//FEOdb::get
 	
 	return writer->VTKExportODB();
+}
+
+void VTUFileManager::SyncSAM(basNewModelShortcut& modelShortcut) {
+	ptoKPartReposInModelShortcut reposInModelSC(modelShortcut);
+	ptoKPartReposShortcut reposSC(reposInModelSC);
+	ptoKPartInReposShortcut inReposSC(reposSC, target.TargetPart(), target.targetPartID);
+	ftrPrimaryObjShortcut sc(inReposSC);
 }
 
 QString TargetList::TargetModel() {

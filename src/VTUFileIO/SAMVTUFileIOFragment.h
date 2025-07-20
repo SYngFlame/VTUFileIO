@@ -6,6 +6,7 @@
 #include <ptsKModelFragment.h>
 #include <g3dVector.h>
 
+#include <basShortcut.h>
 #include <VTUFileManager.h>
 
 class omuArguments;

@@ -2,6 +2,7 @@
 #define VTUFILEMANAGER
 
 #include <ptoKPartRepository.h>
+#include <basShortcut.h>
 #include <QtPlugin>
 
 class VTUContainerWriter;
@@ -20,6 +21,7 @@ struct TargetList{
 	const wchar_t* targetPath;
 	const wchar_t* targetModel;
 	const wchar_t* targetPart;
+	int targetPartID;
 	VTKType type;
 	int displayMode;//int type of omuObjectToDisplayTypeEnm
 
@@ -56,6 +58,7 @@ public:
 	int WriteFile();
 	int ReadToCache();
 	int ReadToSAM();
+	void SyncSAM(basNewModelShortcut& modelShortcut);
 };
 
 #endif // !VTUFILEMANAGER

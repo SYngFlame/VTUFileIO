@@ -16,7 +16,7 @@
 #include <omuPrimType.h>
 
 
-
+class SAMFileDialog;
 class VTUFileIOForm;
 class basBasis;
 
@@ -51,6 +51,7 @@ protected:
     virtual void createToolboxItems();
 
 private:
+    SAMFileDialog* fileDialog;
     
 private slots:
     void PrintMsg();

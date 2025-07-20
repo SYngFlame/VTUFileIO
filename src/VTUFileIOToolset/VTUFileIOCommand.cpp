@@ -12,7 +12,7 @@ void VTUFileIOCommand::CommitPrint() {
 	omuArguments args;
 
 	const sesGVpContext& context = sesGSessionState::Instance()->ConstGetVpContext();
-	QString pyt = QString("mdb.models['%1']").arg(context.ModelName()).arg(context.PartName());
+	QString pyt = QString("mdb.models['%1']").arg(context.ModelName());
 	if (context.ModelName().isEmpty() || context.PartName().isEmpty()) return;
 
 	omuMethodCall mc(pyt, "printAll", args);

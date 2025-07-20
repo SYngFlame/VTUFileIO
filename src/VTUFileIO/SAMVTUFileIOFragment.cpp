@@ -145,7 +145,8 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 	{
 		fileManager->Init(path, modelName);
 		if (!(status |= fileManager->ReadToCache())) {
-			fileManager->ReadToSAM();
+			status |= fileManager->ReadToSAM();
+			fileManager->SyncSAM(modelShortcut);
 		}
 		delete fileManager;
 	}
@@ -153,6 +154,5 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 
 	//TODO:Complete error report
 	MessageHandler::ReportImportErr(status);
-
 	return 0;
 }

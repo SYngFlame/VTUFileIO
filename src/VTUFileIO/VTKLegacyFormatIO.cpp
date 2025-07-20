@@ -325,7 +325,7 @@ int VTKLegacyFormatReader::Read() {
 	}
 
 	//state |= ReadMaterials();
-	if (status & 1 || status & 2) return 0;
+	if ((status & 1) && (status & 2)) return 0;
 	else return ERRORTYPE_FILE_READ_FAILED;
 }
 
@@ -333,19 +333,8 @@ int VTKLegacyFormatReader::ReadPoints(int numPoints) {
 	for (int i = 0; i < numPoints; ++i) {
 		if (stream->atEnd()) return ERRORTYPE_WRONG_NODE_DATA;
 
-		QString line = stream->readLine().trimmed();
-		QStringList coords = line.split(' ', QString::SkipEmptyParts);
-		if (coords.size() < 3) return ERRORTYPE_WRONG_NODE_DATA;
-
-		bool ok;
-		float x = coords[0].toFloat(&ok);
-		if (!ok) return ERRORTYPE_WRONG_NODE_DATA;
-
-		float y = coords[1].toFloat(&ok);
-		if (!ok) return ERRORTYPE_WRONG_NODE_DATA;
-
-		float z = coords[2].toFloat(&ok);
-		if (!ok) return ERRORTYPE_WRONG_NODE_DATA;
+		float x, y, z;
+		*stream >> x >> y >> z;
 
 		data->InsertNextPoint(i, x, y, z);
 
