@@ -80,74 +80,55 @@ omuPrimitive* SAMVTUFileIOFragment::Copy() const
 
 omuPrimitive* SAMVTUFileIOFragment::printAll(omuArguments& args)
 {
-    // 打开ODB文件并确保读取基础数据
-    odbOdb& odb = odbOdbRepository::Instance().get("E:/internship/Utils/zhen/bin/Debug/test.h5");
-    //odb.Read();            // 确保读取基础数据
-    odb.ReadStepCon();     // 加载步骤容器信息
-    qDebug() << "ODB file opened successfully. Analysis Title:" << odb.analysisTitle();
+	// 打开ODB文件并确保读取基础数据
+	odbOdb* odb = 0;
+	odb = &odbOdbRepository::Instance().get("E:/internship/Utils/zhen/bin/Debug/test.h5");
+	//odb.Read();            // 确保读取基础数据
+	//qDebug() << "ODB file opened successfully. Analysis Title:" << odb.analysisTitle();
 
-    // 1. 按名称查找Step-1
-    odbStepRepository& stepsRep = odb.steps();
-    if (!stepsRep.isMember("Step-1")) {
-        qDebug() << "Error: Step-1 not found in ODB";
-        return nullptr;
-    }
+	// 1. 按名称查找Step-1
+	odbStepRepositoryIT odbStepRepositoryIter(odb->steps());
 
-    // 获取Step-1
-    odbStep& step = stepsRep["Step-1"];
-	//step.Read();
-    // 使用更安全的方式获取帧数量
-    int frameCount = 0;
-    try {
-        // 使用constGet方法避免潜在问题
-        const odbSequenceFrame& frames = step.frames(); 
-        frameCount = frames.size();
+	for (odbStepRepositoryIter.first(); !odbStepRepositoryIter.isDone(); odbStepRepositoryIter.next())
+	{
+		const QString& stepName = odbStepRepositoryIter.currentKey();
+		const odbStep& step = odbStepRepositoryIter.currentValue();
+
+		const odbSequenceFrame& frames = step.frames();
 		odbFrame& frame = frames.get(0);
-    }
+		frame.update();
 
-    catch (...) {
-        qDebug() << "Warning: Failed to access frames container";
-    }
+		//get fields
+		QString fieldName = 'U';
+		const odbFieldOutputRepository& fields = frame.fieldOutputs();
+		const odbSequenceString fieldNames = fields.getFieldOutputNames();
+		int fieldsNum = fieldNames.size();
+		const odbFieldOutput& field = fields[fieldName];
+	}
+	odbStepRepository& stepsRep = odb->steps();
+	if (!stepsRep.isMember("Step-1")) {
+		qDebug() << "Error: Step-1 not found in ODB";
+		return nullptr;
+	}
+	//debug: mdb.models['Model-1'].printAll()
 
-    qDebug() << "\nStep:" << step.name()
-        << "| Description:" << step.description()
-        << "| Domain:" << (step.domain() == odbEnum::TIME ? "TIME" : "UNKNOWN")
-        << "| Frames:" << frameCount;
+	// 获取Step-1
+	odbStep& step = stepsRep.get("Step-1");
+	//get frame
+	int frameIndex = 0;
+	odbSequenceFrame& frames = step.frames();
+	odbFrame& frame = frames.get(frameIndex);
+	frame.update();
+	//get fields
+	QString fieldName = 'U';
+	const odbFieldOutputRepository& fields = frame.fieldOutputs();
+	const odbSequenceString fieldNames = fields.getFieldOutputNames();
+	int fieldsNum = fieldNames.size();
+	const odbFieldOutput& field = fields[fieldName];
+	//step.Read();
 
-    // 2. 使用更安全的方式获取Frame-0
-    odbFrame* pFrame = nullptr;
-    try {
-        // 使用frames()方法获取帧引用
-        pFrame = &step.frames(0);
-    }
-    catch (...) {
-        qDebug() << "Error: Failed to access frame 0";
-        return nullptr;
-    }
-
-    if (!pFrame) {
-        qDebug() << "Error: Frame 0 is null";
-        return nullptr;
-    }
-
-    odbFrame& frame = *pFrame;
-
-
-    // 3. 获取场输出
-    const odbFieldOutputRepository& fieldOutputs = frame.fieldOutputs();
-    if (!fieldOutputs.isMember("U")) {
-        qDebug() << "Error: Field output 'U' not found";
-        return nullptr;
-    }
-
-
-	const odbSequenceString fieldOutput = fieldOutputs.getFieldOutputNames();
-	//qDebug() << "\nfieldOutput:" << fieldOutput;
-	
-
-    
-    qDebug() << "\nProcessing complete! Successfully read Step data?";
-    return nullptr;
+	qDebug() << "\nProcessing complete! Successfully read Step data?";
+	return nullptr;
 }
 omuPrimitive* SAMVTUFileIOFragment::initWriteManager(omuArguments& args) {
 
