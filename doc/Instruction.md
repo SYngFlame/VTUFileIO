@@ -1,5 +1,10 @@
 # VTUFileIO 模块
 
+VTUFileIO 模块支持 SAM 网格数据对 VTK 格式数据的导入导出。
+目前支持 VTK 文件格式版本:
+导入：VTK Legacy 3.0/5.1
+导出: VTK Legacy 3.0
+
 ## 一、项目结构
 
 <ul style="list-style-type: circle;">
@@ -7,11 +12,15 @@
     <ul style="list-style-type: circle;">
       <li><b>VTKFileIO</b>
         <ul style="list-style-type: disc;">
-          <li>SAMVTKFileIOFragment  /SAM内核数据访问核心
-          <li>VTUDataContainer    /VTK中转数据缓存
-          <li>VTUElementHandler /SAM单元类型枚举方法
-          <li>VTUFileManager    /SAM VTK数据中转
-          <li>VTUFileWriter /引用VTK库的数据写出方法
+          <li>SAMVTKFileIOFragment
+          <li>VTUElementHandler
+          <li>VTUFileManager
+          <li>VTUDataContainer
+          <li>VTUContainerWriter
+          <li>VTUContainerReader
+          <li>FormatIO
+          <li>VTKLegacyFormatIO
+          <li>MessageHandler
           <li>VTUFileIOPytMoudle
           <li>VTUIOUtils</li>
         </ul>
@@ -58,13 +67,12 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 ### 用户操作流程设计
 
-1. 点击**File**->**Export**->**VTK Legacy..**；
+1. 点击**File**->**Export**->**VTK Legacy..** (未实现，按钮暂存在VTKTest下)；
 
 2. 在弹出文件浏览器选择VTK保存的位置，设置文件名称；
 ![Export](./pictures/ExportUI.png)
 
-3. 点击Save完成导出，
-当前视图下的模型将会导出到指定目录下。
+3. 点击Save完成导出，当前视图下的模型将会导出到指定目录下，导出完成信息将在 Message 窗口显示。
 
 ### 详细设计
 
@@ -78,12 +86,9 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 ### 用户操作流程设计
 
-1. 点击**File**->**Import**->**VTK Part**；
+1. 点击**File**->**Import**->**VTK Part** (未实现，按钮暂存在VTKTest下)；
 
-2. 通过文件浏览器窗口选取VTK文件，界面同Export模块；
-
-3. 通过弹窗确定插入Part，如图；
-![Import](./pictures/ImportUI.png)
+2. 通过文件浏览器窗口选取VTK文件，界面同Export模块，随后导入完成信息将在 Message 窗口显示。
 
 ### 详细设计
 
@@ -93,9 +98,14 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 以下是这个项目在允许时间内可能会额外实现的功能，皆为原有功能基础上的拓展，以期给VTK模块拓展更多实用功能。
 
+### VTK 版本支持
+
+添加主流 VTK Legacy 版本 VTK3.0 和 VTK5.1 的读写支持。
+(目前支持 VTK3.0 读写操作、VTK5.1 读操作)
+
 ### VTU支持
 
-`VTU`是**XML**化的**VTK**文件，相对经典的VTK文件`VTK Legacy`，`VTU`可以支持更多VTK扩展的数据。
+`VTU`是 **XML** 化的 **VTK** 文件，相对经典的VTK文件`VTK Legacy`，`VTU`可以支持更多VTK扩展的数据。
 
 需要额外引入QtXml模块
 
@@ -103,12 +113,5 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 
 批量导出设计了一个带复选框的模型树窗口，若工程中包含多个**Model**以及多个**Part**，批量导出可以帮助将**Part**分别输出为单独的**VTK**文件。
 
-### 导出梁单元型材
+## 开发日志
 
-在梁单元具备型材Profile属性的情况下，将梁单元的型材属性作为VTK模型的一部分导出，以此得到符合建模的、更真实的物理模型。
-
-需要额外引入SAM中Set的功能读写的方法，建立相对独立的功能模块。
-
-### 单元转换开关
-
-SAM中存在多种单元，如梁单元有 B31 和 B33，四边形单元有 S4，S4I，S4R。这些单元在模型中节点数相同，而在求解时节点数存在差异。在ODB后处理数据导出时需要转换为多段线、带插值点的四边形等计算更加精确的单元类型。在模型数据导出时或可考虑转换单元类型输出。这个扩展功能将大幅增加模块复杂度。

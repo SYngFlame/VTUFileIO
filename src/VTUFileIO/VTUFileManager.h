@@ -18,9 +18,9 @@ enum VTKType {
 };
 
 struct TargetList{
-	const wchar_t* targetPath;
-	const wchar_t* targetModel;
-	const wchar_t* targetPart;
+	wchar_t targetPath[128];
+	wchar_t targetModel[128];
+	wchar_t targetPart[128];
 	int targetPartID;
 	VTKType type;
 	int displayMode;//int type of omuObjectToDisplayTypeEnm
@@ -58,7 +58,8 @@ public:
 	int WriteFile();
 	int ReadToCache();
 	int ReadToSAM();
-	void SyncSAM(basNewModelShortcut& modelShortcut);
+
+	const QString GetTargetPartName();
 };
 
 #endif // !VTUFILEMANAGER

@@ -14,7 +14,7 @@
 //#include <ptoKPartShortcut.h>
 //#include <ftrPrimaryObjShortcut.h>
 //#include <sesKSessionState.h>
-//#include <smgSceneManagerRole.h>
+#include <cmdKCommandDeliveryRole.h>
 
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
@@ -151,15 +151,23 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 		fileManager->Init(path, modelName);
 		if (!(status |= fileManager->ReadToCache())) {
 			status |= fileManager->ReadToSAM();
+
 			//fileManager->SyncSAM(modelShortcut);
 			/*smgSceneManagerRole& role = smgSceneManagerRole::TheSceneManagerRole();
 			role.UpdateDisplay(smg_Part, true);
 			role.Refresh();
-
+			
 			ptoKPartReposInModelShortcut reposInModelSC(modelShortcut);
 			ptoKPartReposShortcut reposSC(reposInModelSC);
 			ptoKPartInReposShortcut inReposSC(reposSC, "chair", 1);
 			ftrPrimaryObjShortcut sc(inReposSC);*/
+		}
+		if (fileManager->GetTargetPartName().isEmpty()) {
+			status |= ERRORTYPE_NOTEXIST;
+		}
+		else{
+			QString pyt = QString("session.viewports['Viewport: 1'].setValues(displayedObject = mdb.models['%1'].parts['%2'])").arg(modelName).arg(fileManager->GetTargetPartName());
+			if (!status) cmdKCommandDeliveryRole::Instance().ProcessCommand(pyt);
 		}
 		delete fileManager;
 	}

@@ -34,9 +34,7 @@ VTUFileManager::~VTUFileManager() {
 }
 
 TargetList::TargetList() {
-	targetPath = NULL;
-	targetPart = NULL;
-	targetModel = NULL;
+	targetPartID = 0;
 	type = VTKLegacy;
 	withOdb = false;
 	displayMode = omu_NONE;
@@ -75,16 +73,18 @@ Read in mdb for extract nodes and elements and path to output VTK files
 */
 void VTUFileManager::Init(const QString& path, const int& display, const QString& modelName, const QString& partName) {
 	
-	this->target.targetPath = reinterpret_cast<const wchar_t*>(path.utf16());
+	wcsncpy(this->target.targetPath, reinterpret_cast<const wchar_t*>(path.utf16()),path.size() + 1);
 	this->target.displayMode = display;
-	this->target.targetModel = reinterpret_cast<const wchar_t*>(modelName.utf16());
-	this->target.targetPart = reinterpret_cast<const wchar_t*>(partName.utf16());
+	wcsncpy(this->target.targetModel, reinterpret_cast<const wchar_t*>(modelName.utf16()), modelName.size() + 1);
+	wcsncpy(this->target.targetPart, reinterpret_cast<const wchar_t*>(partName.utf16()), partName.size() + 1);
 };
 
 void VTUFileManager::Init(const QString& path, const QString& modelName) {
 
-	this->target.targetPath = reinterpret_cast<const wchar_t*>(path.utf16());
-	this->target.targetModel = reinterpret_cast<const wchar_t*>(modelName.utf16());
+	wcsncpy(this->target.targetPath, reinterpret_cast<const wchar_t*>(path.utf16()), path.size() + 1);
+	wcsncpy(this->target.targetModel, reinterpret_cast<const wchar_t*>(modelName.utf16()), modelName.size() + 1);
+	QString baseName = QFileInfo(path).baseName();
+	wcsncpy(this->target.targetPart, reinterpret_cast<const wchar_t*>(baseName.utf16()), baseName.size() + 1);
 };
 
 int VTUFileManager::WriteCache() {
@@ -119,8 +119,10 @@ int VTUFileManager::ReadToCache() {
 }
 
 int VTUFileManager::ReadToSAM() {
-	
-	int status = reader->ConstructNewPart(target.TargetModel(), QFileInfo(target.TargetPath()).baseName(), target.targetPartID);
+	QString targetP = target.TargetPart();
+	int status = reader->ConstructNewPart(target.TargetModel(), targetP, target.targetPartID);
+	//memset((void*)target.targetPart, 0, 128 * sizeof(wchar_t));
+	wcsncpy(target.targetPart, reinterpret_cast<const wchar_t*>(targetP.utf16()), targetP.size() + 1);
 	//reader->ReleaseMemory();
 	delete reader;
 	delete writer;
@@ -170,13 +172,6 @@ int VTUFileManager::writeODB() {
 	return writer->VTKExportODB();
 }
 
-void VTUFileManager::SyncSAM(basNewModelShortcut& modelShortcut) {
-	ptoKPartReposInModelShortcut reposInModelSC(modelShortcut);
-	ptoKPartReposShortcut reposSC(reposInModelSC);
-	ptoKPartInReposShortcut inReposSC(reposSC, target.TargetPart(), target.targetPartID);
-	ftrPrimaryObjShortcut sc(inReposSC);
-}
-
 QString TargetList::TargetModel() {
 	return QString::fromWCharArray(targetModel);
 }
@@ -187,4 +182,8 @@ QString TargetList::TargetPart() {
 
 QString TargetList::TargetPath() {
 	return QString::fromWCharArray(targetPath);
+}
+
+const QString VTUFileManager::GetTargetPartName() {
+	return target.TargetPart().trimmed();
 }
