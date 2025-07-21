@@ -4,8 +4,6 @@
 #include <ptoKPart.h> 
 #include <smgSceneManagerRole.h>
 #include <ftrFeatureList.h>
-#include <visKSceneManager.h>
-#include <ptsKMeshFactory.h>
 #include <bmeMesh.h> 
 #include <omeMesh.h>
 #include <mesUtils.h>
@@ -16,8 +14,6 @@
 
 #include <VTUDataContainer.h>
 #include <MessageHandler.h>
-
-#include <qhash.h>
 
 VTUContainerReader::VTUContainerReader(VTUDataContainer *container) {
 	this->VTKData = container;
@@ -146,7 +142,7 @@ int VTUContainerReader::ConstructElemClasses(bmeElementClass*** classes, int* nu
 		*numCls =  clsVec.size();
 	}
 
-	//TODO: DO those codes work?
+	//TODO: Do these codes work?
 	smgSceneManagerRole& role = smgSceneManagerRole::TheSceneManagerRole();
 	role.UpdateDisplay(smg_Part, true);
 	role.Refresh();

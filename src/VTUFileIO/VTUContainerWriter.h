@@ -6,6 +6,7 @@
 class QString;
 class ptoKPart;
 class QFile;
+class bmeMesh;
 class bmeElementClass;
 class VTUDataContainer;
 
@@ -18,7 +19,8 @@ public:
 	VTUContainerWriter();
 	~VTUContainerWriter();
 
-	int GetVTKPart(ptoKPart part);
+	int ReadVTKPart(ptoKPart part);
+	int ReadVTKMesh(const bmeMesh* mesh);
 	VTUDataContainer* GetContainerPointer();
 	int VTKExportODB();
 

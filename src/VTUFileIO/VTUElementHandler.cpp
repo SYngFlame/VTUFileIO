@@ -110,7 +110,3 @@ QString VTUElementHandler::GetSAMTypeByVTKType(VTKType typeEnum, int beamType, i
 			return "";
 	}
 }
-
-bool VTUElementHandler::IsCube(VTKType typeEnum) {
-	return (typeEnum == VTK_VOXEL) || (typeEnum == VTK_HEXAHEDRON);
-}

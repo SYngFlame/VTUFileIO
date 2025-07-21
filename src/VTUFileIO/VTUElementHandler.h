@@ -35,11 +35,6 @@ public:
 	static int GetArrayLengthByLabel(const QString& typeLabel);
 	static int GetArrayLengthByEnum(VTKType typeEnum);
 
-	/*
-	* 由于 VTK 和 SAM 六面体节点编号顺序不同，需要在 VTUContainerWriter 写入 Container 时做转换。
-	*/
-	static bool IsCube(VTKType typeEnum);
-
 	static QString GetSAMTypeByVTKType(VTKType typeEnum, int beamType = 0, int cubeType = 0, int quadType = 0);
 };
 

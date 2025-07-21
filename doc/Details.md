@@ -10,47 +10,48 @@
 
 ![Work Flow](./pictures/WorkFlow.png)
 
-### 功能模块说明
+### 模块功能说明
+
 <li><b>VTKFileIO</b>
         <ul style="list-style-type: disc;">
           <li>SAMVTKFileIOFragment
             <ul style="list-style-type: none;">
-              <li>ptsKModelFragment继承类，接收Gui端的读写VTK命令
+              <li>ptsKModelFragment 继承类，接收 Gui 端发出的的 VTK 读写命令。
               </li>
             </ul>
           <li>VTUElementHandler
             <ul style="list-style-type: none;">
-              <li>定义SAM单元类型与VTK单元类型的转换，定义单元对应的顶点数据长度
+              <li>定义 SAM 单元类型与 VTK 单元类型的转换，定义单元对应的顶点数据长度。
               </li>
             </ul>
           <li>VTUFileManager
             <ul style="list-style-type: none;">
-              <li>数据中转站，调用方法将 SAM 或 VTK 数据转换为 DataContainer
+              <li>数据中转站，调用方法将 SAM 或 VTK 数据转换为 DataContainer。
               </li>
             </ul>
           <li>VTUDataContainer
             <ul style="list-style-type: none;">
-              <li>缓存中转数据
+              <li>缓存中转数据。
               </li>
             </ul>
           <li>VTUContainerWriter
             <ul style="list-style-type: none;">
-              <li>将 SAM 数据写入 DataContainer 数据缓存类的方法
+              <li>将 SAM 数据写入 DataContainer 数据缓存类的方法。
               </li>
             </ul>
           <li>VTUContainerReader
             <ul style="list-style-type: none;">
-              <li>将 DataContainer 数据读入 SAM 的方法
+              <li>将 DataContainer 数据读入 SAM 的方法。
               </li>
             </ul>
           <li>FormatIO
             <ul style="list-style-type: none;">
-              <li>DataContainer 缓存数据写入存储和从存储读出的模板类
+              <li>DataContainer 缓存数据写入存储和从存储读出的模板类。
               </li>
             </ul>
           <li>VTKLegacyFormatIO
             <ul style="list-style-type: none;">
-              <li>FormatIO的实现类，是VTK Legacy文件的读写方法
+              <li>FormatIO 的继承类，实现 VTK Legacy 文件的读写方法。
               </li>
             </ul>
           <li>MessageHandler
@@ -162,8 +163,6 @@
 		static int GetArrayLengthByLabel(const QString& typeLabel);
 		static int GetArrayLengthByEnum(VTKType typeEnum);
 
-		static bool IsCube(VTKType typeEnum);
-
 		static QString GetSAMTypeByVTKType(VTKType typeEnum, int beamType = 0, int cubeType = 0, int quadType = 0);
 	};
 	```
@@ -227,44 +226,63 @@
 
 [Import Classes View](./pictures/ExportClassView.png)
 
++ 导入控制流程：
+
+	```cpp
+	//SAMVTUFileIOFragment.cpp
+	fileManager = new VTUFileManager;
+	if (fileManager != NULL)
+	{
+		fileManager->Init(path, modelName);
+		if (!(status |= fileManager->ReadToCache())) {
+			status |= fileManager->ReadToSAM();
+		}
+		if (fileManager->GetTargetPartName().isEmpty()) {
+			status |= ERRORTYPE_NOTEXIST;
+		}
+		else{
+			QString pyt = QString("session.viewports['Viewport: 1'].setValues(displayedObject = mdb.models['%1'].parts['%2'])").arg(modelName).arg(fileManager->GetTargetPartName());
+			if (!status) cmdKCommandDeliveryRole::Instance().ProcessCommand(pyt);
+		}
+		delete fileManager;
+	}
+	```
+
 + VTK Legacy 格式读入至数据缓存 DataContainer
 
 	```cpp
-	int VTKLegacyFormatReader::Read() {
+	int VTUFileManager::ReadToCache() {
+		writer = new VTUContainerWriter();
+		fileReader = new VTKLegacyFormatReader(target.TargetPath(), writer->GetContainerPointer());
 
-		if (!file) return ERRORTYPE_NOTEXIST;
+		int status = fileReader->Read();
 
-		if (stream->atEnd()) return ERRORTYPE_FILE_READ_FAILED;
-		QString versionLine = stream->readLine();
-		if (!versionLine.startsWith("# vtk DataFile Version")) {
-			return ERRORTYPE_FILE_READ_FAILED;
-		}
+		MessageHandler::ReportImportInfo(fileReader->GetNodesRead(), fileReader->GetCellsRead());
+		delete fileReader;
 
-		// Comment line (skip)
-		if (stream->atEnd()) return ERRORTYPE_FILE_READ_FAILED;
+		if(status == 0) reader = new VTUContainerReader(writer->GetContainerPointer());
 
-		stream->readLine();
-
-		// Format (only ASCII supported)
-		if (stream->atEnd()) return ERRORTYPE_FILE_READ_FAILED;
-		QString format = stream->readLine().trimmed();
-		if (format != "ASCII") {
-			return ERRORTYPE_FILE_READ_FAILED;
-		}
-
-		// Dataset type
-		if (stream->atEnd()) return ERRORTYPE_FILE_READ_FAILED;
-		QString dataset = stream->readLine().trimmed();
-		if (!dataset.startsWith("DATASET UNSTRUCTURED_GRID")) {
-			return ERRORTYPE_FILE_READ_FAILED;
-		}
-		QString version = versionLine.split(' ', QString::SkipEmptyParts)[4];
-		if (version == "3.0")
-			return Read30();
-		else if (version == "5.1")
-			return Read51();
-		else
-			return ERRORTYPE_FILE_READ_FAILED;
+		return status;
 	}
 	```
-+ 
++ DataContainer 数据写入 SAM
+	```cpp
+	//VTUFileManager.cpp
+	int VTUFileManager::ReadToSAM() {
+		QString targetP = target.TargetPart();
+		int status = reader->ConstructNewPart(target.TargetModel(), targetP, target.targetPartID);
+		//memset((void*)target.targetPart, 0, 128 * sizeof(wchar_t));
+		wcsncpy(target.targetPart, reinterpret_cast<const wchar_t*>(targetP.utf16()), targetP.size() + 1);
+		//reader->ReleaseMemory();
+		delete reader;
+		delete writer;
+		writer = NULL;
+		reader = NULL;
+		return status;
+	}
+
+	//VTUContainerReader.cpp
+	int VTUContainerReader::ConstructNewPart(const QString& modelName, QString& partName, int& partID) {}
+	int VTUContainerReader::ConstructElemClasses(bmeElementClass*** classes, int* numCls) {}
+
+	```

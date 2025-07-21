@@ -149,23 +149,16 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 	if (fileManager != NULL)
 	{
 		fileManager->Init(path, modelName);
+		//读入缓存
 		if (!(status |= fileManager->ReadToCache())) {
+			//读入SAM
 			status |= fileManager->ReadToSAM();
-
-			//fileManager->SyncSAM(modelShortcut);
-			/*smgSceneManagerRole& role = smgSceneManagerRole::TheSceneManagerRole();
-			role.UpdateDisplay(smg_Part, true);
-			role.Refresh();
-			
-			ptoKPartReposInModelShortcut reposInModelSC(modelShortcut);
-			ptoKPartReposShortcut reposSC(reposInModelSC);
-			ptoKPartInReposShortcut inReposSC(reposSC, "chair", 1);
-			ftrPrimaryObjShortcut sc(inReposSC);*/
 		}
 		if (fileManager->GetTargetPartName().isEmpty()) {
 			status |= ERRORTYPE_NOTEXIST;
 		}
 		else{
+			//刷新视图
 			QString pyt = QString("session.viewports['Viewport: 1'].setValues(displayedObject = mdb.models['%1'].parts['%2'])").arg(modelName).arg(fileManager->GetTargetPartName());
 			if (!status) cmdKCommandDeliveryRole::Instance().ProcessCommand(pyt);
 		}
@@ -173,7 +166,6 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 	}
 	else status |= ERRORTYPE_MEMORY_ALLOC_FAILED;
 
-	//TODO:Complete error report
 	MessageHandler::ReportImportErr(status);
 	return 0;
 }

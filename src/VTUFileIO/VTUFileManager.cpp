@@ -7,9 +7,8 @@
 #include <basBasis.h>
 #include <basNewModel.h>
 #include <omuPrimType.h>
-#include <ptoKPartShortcut.h>
-#include <ftrPrimaryObjShortcut.h>
-#include <sesKSessionState.h>
+#include <asoKUtils.h>
+#include <asoFPartInstance.h>
 
 #include <VTUContainerWriter.h>
 #include <VTUContainerReader.h>
@@ -17,7 +16,6 @@
 #include <VTKLegacyFormatIO.h>
 #include <MessageHandler.h>
 
-#include <qfile.h>
 #include <qfileinfo.h>
 #include <qstring.h>
 
@@ -41,10 +39,8 @@ TargetList::TargetList() {
 }
 
 const ptoKPartRepository& VTUFileManager::ConstGetModelParts(const QString& model) {
-
 	basBasis* bas = basBasis::Instance();
 	basMdb mdb = bas->Fetch();
-
 	return ptoKConstGetPartRepos(mdb, model);
 }
 
@@ -56,16 +52,6 @@ ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 	basNewModel& targetModel = mdoelMap.Get(model);
 	
 	return dynamic_cast<ptoKPartRepository&>(targetModel.GetPart());
-}
-
-const cowListString& VTUFileManager::GetAssemblyParts(const QString& model) {
-
-	basBasis* bas = basBasis::Instance();
-	basMdb mdb = bas->Fetch();
-	const basModelMap& models = mdb.ConstGetModels();
-
-	basNewModel cur_model = models.ConstGet(model);
-	return cur_model.ConstGetInstanceTable().Keys();
 }
 
 /*
@@ -86,23 +72,6 @@ void VTUFileManager::Init(const QString& path, const QString& modelName) {
 	QString baseName = QFileInfo(path).baseName();
 	wcsncpy(this->target.targetPart, reinterpret_cast<const wchar_t*>(baseName.utf16()), baseName.size() + 1);
 };
-
-int VTUFileManager::WriteCache() {
-	
-	writer = new VTUContainerWriter();
-	switch (target.displayMode) {
-		case omu_PART: {
-			return writeSinglePart();
-		}
-		case omu_ASSEMBLY: {
-			return writeAllParts();
-		}
-		case omu_ODB: {
-			return writeODB();
-		}
-	}
-	return ERRORTYPE_WRONG_SCENE;
-}
 
 int VTUFileManager::ReadToCache() {
 	writer = new VTUContainerWriter();
@@ -131,6 +100,23 @@ int VTUFileManager::ReadToSAM() {
 	return status;
 }
 
+int VTUFileManager::WriteCache() {
+
+	writer = new VTUContainerWriter();
+	switch (target.displayMode) {
+	case omu_PART: {
+		return writeSinglePart();
+	}
+	case omu_ASSEMBLY: {
+		return writeAssemblyParts();
+	}
+	case omu_ODB: {
+		return writeODB();
+	}
+	}
+	return ERRORTYPE_WRONG_SCENE;
+}
+
 int VTUFileManager::WriteFile() {
 
 	fileWriter = new VTKLegacyFormatWriter(target.TargetPath(), writer->GetContainerPointer());
@@ -150,18 +136,20 @@ int VTUFileManager::writeSinglePart() {
 	const ptoKPartRepository& parts = ConstGetModelParts(target.TargetModel());
 	if (parts.IsEmpty())
 		return ERRORTYPE_NOTEXIST;
-	return writer->GetVTKPart(parts.ConstGet(target.TargetPart()));
+	return writer->ReadVTKPart(parts.ConstGet(target.TargetPart()));
 }
 
-int VTUFileManager::writeAllParts() {
-	const ptoKPartRepository& parts = ConstGetModelParts(target.TargetModel());
-	//const cowListString& assmParts = GetAssemblyParts(target.TargetModel());
-	if (parts.IsEmpty())
-		return ERRORTYPE_NOTEXIST;
+int VTUFileManager::writeAssemblyParts() {
+	asoKAssembly assm = asoKConstGetAssembly(target.TargetModel());
+	ftrFeatureList* fl = assm.GetFeatureList();
+	cowListInt instIDs = asoFPartInstanceAC::GetActiveIds(*fl);
 	int status = 0;
-	for (int i = 1; i <= parts.Size(); ++i) {
-		//if(assmParts.FindMember(parts.GetKey(i)) != -1)
-			status |= writer->GetVTKPart(parts.ConstGet(i));
+	for (int i = 0; i < instIDs.Length(); ++i) {
+		int meshInstID = instIDs.Get(i);
+		if (!fl->MeshExists(meshInstID))
+			return ERRORTYPE_NOTEXIST;
+		const bmeMesh* mesh = fl->ConstGetMesh(meshInstID);
+		status |= writer->ReadVTKMesh(mesh);
 	}
 	return status;
 }

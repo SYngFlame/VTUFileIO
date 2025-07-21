@@ -10,6 +10,7 @@ class VTUContainerReader;
 class FormatWriter;
 class FormatReader;
 class QString;
+class basMdb;
 
 enum omuObjectToDisplayTypeEnm;
 enum VTKType {
@@ -41,12 +42,12 @@ private:
 	FormatWriter* fileWriter;
 	FormatReader* fileReader;
 
-	static const cowListString& GetAssemblyParts(const QString& model);
 	static ptoKPartRepository& GetModelParts(const QString& model);
 	static const ptoKPartRepository& ConstGetModelParts(const QString& model);
-	int VTUFileManager::writeSinglePart();
-	int VTUFileManager::writeAllParts();
-	int VTUFileManager::writeODB();
+	static basMdb& GetbasMdb();
+	int writeSinglePart();
+	int writeAssemblyParts();
+	int writeODB();
 
 public:
 	VTUFileManager();

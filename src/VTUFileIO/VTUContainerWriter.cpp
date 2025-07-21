@@ -20,13 +20,15 @@ VTUContainerWriter::~VTUContainerWriter() {
 
 }
 
-int VTUContainerWriter::GetVTKPart(ptoKPart part) {
+int VTUContainerWriter::ReadVTKPart(ptoKPart part) {
 	ftrFeatureList* ftrlist = part.GetFeatureList();
 	if (!(ftrlist->MeshExists(bdoDefaultInstId)))
 		return ERRORTYPE_NOTEXIST;
 
-	bmeMesh* mesh = ftrlist->GetMesh(bdoDefaultInstId);
-	if (!(mesh->NumNodes())) 
+	return ReadVTKMesh(ftrlist->ConstGetMesh(bdoDefaultInstId));
+}
+int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh) {
+	if (!(mesh->NumNodes()))
 		return ERRORTYPE_WRONG_NODE_DATA;
 
 	const bmeNodeData& nodeData = mesh->NodeData();
@@ -52,18 +54,17 @@ int VTUContainerWriter::GetVTKPart(ptoKPart part) {
 		int length = VTUElementHandler::GetArrayLengthByEnum(type);
 		for (int e = 0; e < elem.NumElements(); ++e) {
 			int* dataSet = (int*)malloc(length * sizeof(int));
-			if (dataSet == NULL) 
+			if (dataSet == NULL)
 				return ERRORTYPE_MEMORY_ALLOC_FAILED;
-			
+
 			if (conn == NULL) return ERRORTYPE_WRONG_ELEMENT_DATA;
 			for (int i = length * e; i < length * (e + 1); ++i) {
 				dataSet[i % length] = VTKData->Index2PositionMap.value(conn[i]);
 			}
 			status |= VTKData->InsertNextElement(type, dataSet);
-			
+
 		}
 	}
-
 	return status;
 }
 
