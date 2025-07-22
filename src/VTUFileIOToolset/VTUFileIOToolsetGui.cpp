@@ -3,9 +3,12 @@
 #include <VTUFileIODb.h>
 #include <VTUFileIOCommand.h>
 
-#include <rgnGRegionToolsetGui.h>
+#include <SAMApp.h>
 #include <SAMMenuPane.h>
+#include <SAMMainWindow.h>
+#include <qmenubar.h>
 #include <SAMMenuCommand.h>
+#include <SAMMainWindow.h>
 
 #include <cmdGCommandDeliveryRole.h>
 #include <SAMFileDialog.h>
@@ -41,32 +44,54 @@ void VTUFileIOToolsetGui::deactivate()
 
 void VTUFileIOToolsetGui::createMenuItems()
 {
-	SAMMenu* testMenu = new SAMMenu(this, tr("&VTKTest"));
-	SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
-	testMenu->addAction(printCmd);
-	connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
+	//SAMMenuCommand* printCmd = new SAMMenuCommand(this, testMenu, tr("&PrintModelInfo"));
+	//testMenu->addAction(printCmd);
+	//connect(printCmd, SIGNAL(triggered(bool)), this, SLOT(PrintMsg()));
 
-	/*
-	SAMMenu* fileMenu = ubiFileToolsetGui::Instance().findChild<SAMMenu*>("&File", Qt::FindChildrenRecursively);
-	if (fileMenu == NULL) {
-		qDebug("Menu not found.");
-		return;
+	//auto fileMenu = ubiFileToolsetGui::Instance();
+
+	//SAMMenu* fileMenu = new SAMMenu(this, tr("&VTK"));
+	
+	auto app = SAMApp::getSAMApp();
+	auto mw = app->getSAMMainWindow();
+	auto menuBar = mw->getMenubar();
+	auto childs = menuBar->actions();
+
+	SAMMenu* fileMenu = NULL;
+	SAMMenu* importMenu = NULL;
+	SAMMenu* exportMenu = NULL;
+
+	for (QAction* action : menuBar->actions()) {
+		if (action->text().contains("File", Qt::CaseInsensitive)) {
+			fileMenu = (SAMMenu*)action->menu();
+			break;
+		}
 	}
+	if (fileMenu == NULL) return;
+	for (QAction* action : fileMenu->actions()) {
+		if (action->text().contains("Import", Qt::CaseInsensitive)) {
+			importMenu = (SAMMenu*)action->menu();
+			qDebug() << "VTUFileIO: Import Menu detected.";
+		}
+		if (action->text().contains("Export", Qt::CaseInsensitive)) {
+			exportMenu = (SAMMenu*)action->menu();
+			qDebug() << "VTUFileIO: Export Menu detected.";
+		}
+	}
+	if (exportMenu == NULL) return;
+	if (importMenu == NULL) return;
 
-	SAMMenu* ExportMenu = fileMenu->findChild<SAMMenu*>("Export", Qt::FindDirectChildrenOnly);
-	SAMMenu* ImportMenu = fileMenu->findChild<SAMMenu*>("Import", Qt::FindDirectChildrenOnly);
-	*/
-
-	SAMMenuCommand* SaveVTKCmd = new SAMMenuCommand(this, testMenu, tr("&VTK Legacy.."));
-	testMenu->addAction(SaveVTKCmd);
+	SAMMenuCommand* SaveVTKCmd = new SAMMenuCommand(this, exportMenu, tr("&VTK Legacy.."));
+	exportMenu->addAction(SaveVTKCmd);
+	qDebug() << "VTUFileIO: Export Menu injected.";
 
 	//SAMMenuCommand* SaveCmd = new SAMMenuCommand(this, fileMenu, tr("&VTU.."));
 	//fileMenu->addAction(SaveVTUCmd);
 
-	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, testMenu, tr("&Import VTK Part"));
-	testMenu->addAction(ImportCmd);
-	
-	
+	SAMMenuCommand* ImportCmd = new SAMMenuCommand(this, importMenu, tr("&Import VTK Part"));
+	importMenu->addAction(ImportCmd);
+	qDebug() << "VTUFileIO: Import Menu injected.";
+
 	connect(SaveVTKCmd, SIGNAL(triggered(bool)), this, SLOT(SaveDialog()));
 	connect(ImportCmd, SIGNAL(triggered(bool)), this, SLOT(OpenDialog()));
 }

@@ -1,15 +1,12 @@
 #include <MessageHandler.h>
 
-//#include <SAMApp.h>
-//#include <SAMMainWindow.h>
+
 
 #include <cmdCWIP.h>
 #include <qstringlist.h>
 #include <qstring.h>
 
 void MessageHandler::ReportExportErr(int err) {
-	//auto app = SAMApp::getSAMApp();
-	//auto mw = app->getSAMMainWindow();
 
 	QStringList warn;
 
