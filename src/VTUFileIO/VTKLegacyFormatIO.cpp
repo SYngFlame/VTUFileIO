@@ -83,7 +83,7 @@ FormatWriter::State VTKLegacyFormatWriter::WritePoints() {
 		else
 			*stream << " ";
 		*stream << x << " " << y << " " << z;
-		
+
 	}
 
 	nodesWritten += data->points.size();
@@ -281,7 +281,7 @@ int VTKLegacyFormatReader::Read() {
 	if (stream->atEnd()) return ERRORTYPE_FILE_READ_FAILED;
 	QString format = stream->readLine().trimmed();
 	if (format != "ASCII") {
-		return ERRORTYPE_FILE_READ_FAILED;
+		return ERRORTYPE_FILE_READ_ASCII;
 	}
 
 	// Dataset type
@@ -296,7 +296,7 @@ int VTKLegacyFormatReader::Read() {
 	else if (version == "5.1")
 		return Read51();
 	else
-		return ERRORTYPE_FILE_READ_FAILED;
+		return ERRORTYPE_FILE_READ_VERSION;
 }
 
 int VTKLegacyFormatReader::Read30() {
@@ -393,7 +393,7 @@ int VTKLegacyFormatReader::ReadCells30(int numCells) {
 		if (!ok || tokens.size() < count + 1) {
 			return ERRORTYPE_WRONG_ELEMENT_DATA;
 		}
-		
+
 		// Copy element connectivity
 		int* conn = (int*)malloc(sizeof(int) * count);
 		if (!conn) return ERRORTYPE_MEMORY_ALLOC_FAILED;
@@ -417,8 +417,8 @@ int VTKLegacyFormatReader::ReadCells51(int numOffsets) {
 	if (!offsets) return ERRORTYPE_MEMORY_ALLOC_FAILED;
 	while (!stream->atEnd()) {
 		QString line = stream->readLine().trimmed();
-		
-		
+
+
 		if (line.startsWith("OFFSETS")) {
 			for (int i = 0; i < numOffsets; ++i) {
 				*stream >> offsets[i];

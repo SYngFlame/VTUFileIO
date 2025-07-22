@@ -6,13 +6,14 @@
 #include <qstringlist.h>
 #include <qstring.h>
 
+
 void MessageHandler::ReportExportErr(int err) {
 
 	QStringList warn;
 
 	cmdCWIP& Ins = cmdCWIP::Instance();
-	{
-		if (!err) Ins.Print("Export Finished");
+	if (!err) {
+		Ins.Print("Export Finished");
 		return;
 	}
 
@@ -34,7 +35,7 @@ void MessageHandler::ReportExportErr(int err) {
 	if (err & ERRORTYPE_MEMORY_ALLOC_FAILED) {
 		warn.append(QString("Error in allocating memory"));
 	}
-	
+
 	for (int i = 0; i < warn.size(); ++i) {
 		Ins.Warning(warn[i]);
 	}
@@ -53,8 +54,9 @@ void MessageHandler::ReportImportErr(int err) {
 	QStringList warn;
 
 	cmdCWIP& Ins = cmdCWIP::Instance();
-	{
-		if (!err) Ins.Print("Import Finished");
+
+	if (!err) {
+		Ins.Print("Import Finished");
 		return;
 	}
 
@@ -78,6 +80,12 @@ void MessageHandler::ReportImportErr(int err) {
 	}
 	if (err & ERRORTYPE_COLLISION_OCCURED) {
 		warn.append(QString("Part name collision."));
+	}
+	if (err & ERRORTYPE_FILE_READ_VERSION) {
+		warn.append(QString("The VTK file is not in the correct version(3.0 or 5.1)."));
+	}
+	if (err & ERRORTYPE_FILE_READ_ASCII) {
+		warn.append(QString("The file is not in ASCII format."));
 	}
 
 	for (int i = 0; i < warn.size(); ++i) {
