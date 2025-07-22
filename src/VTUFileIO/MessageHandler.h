@@ -11,9 +11,11 @@
 #define ERRORTYPE_MEMORY_RELEASE_FAILED (0x01 << 7)
 #define ERRORTYPE_SAM_ACTION_FAILED (0x01 << 8)
 #define ERRORTYPE_COLLISION_OCCURED (0x01 << 9)
-
-class MessageHandler{
+#define ERRORTYPE_FILE_READ_VERSION (0x01 << 10)
+#define ERRORTYPE_FILE_READ_ASCII (0x01 << 11)
+class MessageHandler {
 public:
+
 	static void ReportExportErr(int err);
 	static void ReportExportInfo(int pointNum, int elemNum);
 	static void ReportImportErr(int err);
