@@ -55,6 +55,13 @@ bool VTUElementHandler::Check3DVTKType(VTUElementHandler::VTKType type) {
 	else return false;
 }
 
+bool VTUElementHandler::IsCube(VTKType type) {
+	if (type == VTK_VOXEL || type == VTK_HEXAHEDRON)
+		return true;
+	else
+		return false;
+}
+
 //Best avoide using this function because it querys all type.
 int  VTUElementHandler::GetArrayLengthByLabel(const QString& typeLabel) {
 

@@ -168,7 +168,7 @@ int VTUFileManager::writeAssemblyParts() {
 
 		gslMatrix transMatrix = asoIns->GetTransform();
 
-		status |= writer->ReadVTKMesh(mesh, &transMatrix);
+		status |= writer->ReadVTKMesh(mesh, true, &transMatrix);
 	}
 	return status;
 }

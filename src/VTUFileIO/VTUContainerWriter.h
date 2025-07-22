@@ -21,7 +21,7 @@ public:
 	~VTUContainerWriter();
 
 	int ReadVTKPart(ptoKPart part);
-	int ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix = nullptr);
+	int ReadVTKMesh(const bmeMesh* mesh, bool transform = false, gslMatrix* transMatrix = nullptr);
 	VTUDataContainer* GetContainerPointer();
 	int VTKExportODB();
 

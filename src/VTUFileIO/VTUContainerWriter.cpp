@@ -29,7 +29,7 @@ int VTUContainerWriter::ReadVTKPart(ptoKPart part) {
 
 	return ReadVTKMesh(ftrlist->ConstGetMesh(bdoDefaultInstId));
 }
-int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix) {
+int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, bool transform, gslMatrix* transMatrix) {
 	if (!(mesh->NumNodes()))
 		return ERRORTYPE_WRONG_NODE_DATA;
 
@@ -37,23 +37,17 @@ int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix)
 	utiCoordCont3D nodeContainer = nodeData.CoordContainer();
 	cowListInt nodeList;
 	nodeData.GetUserNodeLabels(nodeList);
-
-	gslVector translation(0, 0, 0);
-	gslPoint rotateBase(0, 0, 0);
-	gslVector dir(0, 0, 0);
-	double x(0), y(0), z(0), radian(0);
-
-	transMatrix->GetTranslation(translation);
-	transMatrix->GetAxisRotation(rotateBase, dir, radian);
-	double c = cos(radian);
-	double s = sin(radian);
-	if (!dir.Normalize())
-		for (int n = 0; n < nodeList.Length(); ++n) {
-			float x, y, z;
-			nodeContainer.GetCoord(n, x, y, z);
-			VTKData->InsertNextPoint(n, x, y, z);
-		}
-	else
+	
+	if (transform)
+	{
+		gslVector translation(0, 0, 0);
+		gslPoint rotateBase(0, 0, 0);
+		gslVector dir(0, 0, 0);
+		double x(0), y(0), z(0), radian(0);
+		transMatrix->GetTranslation(translation);
+		transMatrix->GetAxisRotation(rotateBase, dir, radian);
+		double c = cos(radian);
+		double s = sin(radian);
 		for (int n = 0; n < nodeList.Length(); ++n) {
 			float x, y, z;
 			nodeContainer.GetCoord(n, x, y, z);
@@ -61,11 +55,18 @@ int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix)
 			gslPoint origin(x, y, z);
 			origin = origin + translation;
 			gslVector p = origin - rotateBase;
-			
+
 			gslVector cross = dir.CrossProduct(p);
 			double dot = dir.DotProduct(p);
 			origin = rotateBase + p * c + cross * s + (dir)*dot * (1 - c);
 			VTKData->InsertNextPoint(n, origin.GetX(), origin.GetY(), origin.GetZ());
+		}
+	}
+	else
+		for (int n = 0; n < nodeList.Length(); ++n) {
+			float x, y, z;
+			nodeContainer.GetCoord(n, x, y, z);
+			VTKData->InsertNextPoint(n, x, y, z);
 		}
 
 	int status = 0;

@@ -26,7 +26,7 @@ int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* da
 	Element e;
 	if (!(e.type = type) || (e.dataSet = dataSet) == nullptr)
 		return ERRORTYPE_WRONG_ELEMENT_DATA;
-	if (type == VTUElementHandler::VTK_VOXEL) {
+	if (VTUElementHandler::IsCube(type)) {
 		int temp;
 		temp = dataSet[2];
 		dataSet[2] = dataSet[3];
@@ -39,4 +39,19 @@ int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* da
 	elemVertices += VTUElementHandler::GetArrayLengthByEnum(e.type) + 1;
 
 	return 0;
+}
+
+void VTUDataContainer::CorrectSAMCubeData() {
+	for (int i = 0; i < elems.size(); ++i) {
+		if (VTUElementHandler::IsCube(elems[i].type)) {
+			int* dataSet = elems[i].dataSet;
+			int temp;
+			temp = dataSet[2];
+			dataSet[2] = dataSet[3];
+			dataSet[3] = temp;
+			temp = dataSet[6];
+			dataSet[6] = dataSet[7];
+			dataSet[7] = temp;
+		}
+	}
 }

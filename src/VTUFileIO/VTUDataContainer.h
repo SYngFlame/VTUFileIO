@@ -25,8 +25,9 @@ public:
 
 	int elemVertices;
 
-	void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z);
-	int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* dataSet);
+	void InsertNextPoint(int index, float x, float y, float z);
+	int InsertNextElement(VTUElementHandler::VTKType type, int* dataSet);
+	void CorrectSAMCubeData();
 
 	VTUDataContainer();
 	~VTUDataContainer();

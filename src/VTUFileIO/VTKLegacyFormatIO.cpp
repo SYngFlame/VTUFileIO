@@ -331,7 +331,7 @@ int VTKLegacyFormatReader::Read30() {
 			status |= ReadCellTypes(numTypes);
 		}
 	}
-
+	data->CorrectSAMCubeData();
 	//state |= ReadMaterials();
 	return status;
 }
@@ -359,7 +359,7 @@ int VTKLegacyFormatReader::Read51() {
 			status |= ReadCells51(numOffsets);
 		}
 	}
-
+	data->CorrectSAMCubeData();
 	//state |= ReadMaterials();
 	return status;
 }

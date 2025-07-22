@@ -1,2 +1,3 @@
-# VTUFileIO
-SAM二次开发VTU文件读写模块/VTU module of SAM Second Development  
+# SAMVTKModule
+
+SAM二次开发VTK文件读写模块/VTK module of SAM Second Development  

@@ -30,7 +30,8 @@ public:
 	static VTKType SimplyConvertTo2DVTKType(const QString& typeLabel);
 	static VTKType SimplyConvertTo3DVTKType(const QString& typeLabel);
 
-	static bool Check3DVTKType(VTUElementHandler::VTKType type);
+	static bool Check3DVTKType(VTKType type);
+	static bool IsCube(VTKType type);
 
 	static int GetArrayLengthByLabel(const QString& typeLabel);
 	static int GetArrayLengthByEnum(VTKType typeEnum);
