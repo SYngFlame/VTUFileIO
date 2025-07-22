@@ -5,6 +5,8 @@
 #include <visKSceneManager.h>
 #include <VTUDataContainer.h>
 
+#include <gslVector.h>
+
 #include <bmeMesh.h> 
 #include <bmeElementClass.h>
 #include <bmeElementClassList.h>
@@ -27,7 +29,7 @@ int VTUContainerWriter::ReadVTKPart(ptoKPart part) {
 
 	return ReadVTKMesh(ftrlist->ConstGetMesh(bdoDefaultInstId));
 }
-int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh) {
+int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix) {
 	if (!(mesh->NumNodes()))
 		return ERRORTYPE_WRONG_NODE_DATA;
 
@@ -36,11 +38,35 @@ int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh) {
 	cowListInt nodeList;
 	nodeData.GetUserNodeLabels(nodeList);
 
-	for (int n = 0; n < nodeList.Length(); ++n) {
-		float x, y, z;
-		nodeContainer.GetCoord(n, x, y, z);
-		VTKData->InsertNextPoint(n, x, y, z);
-	}
+	gslVector translation(0, 0, 0);
+	gslPoint rotateBase(0, 0, 0);
+	gslVector dir(0, 0, 0);
+	double x(0), y(0), z(0), radian(0);
+
+	transMatrix->GetTranslation(translation);
+	transMatrix->GetAxisRotation(rotateBase, dir, radian);
+	double c = cos(radian);
+	double s = sin(radian);
+	if (!dir.Normalize())
+		for (int n = 0; n < nodeList.Length(); ++n) {
+			float x, y, z;
+			nodeContainer.GetCoord(n, x, y, z);
+			VTKData->InsertNextPoint(n, x, y, z);
+		}
+	else
+		for (int n = 0; n < nodeList.Length(); ++n) {
+			float x, y, z;
+			nodeContainer.GetCoord(n, x, y, z);
+
+			gslPoint origin(x, y, z);
+			origin = origin + translation;
+			gslVector p = origin - rotateBase;
+			
+			gslVector cross = dir.CrossProduct(p);
+			double dot = dir.DotProduct(p);
+			origin = rotateBase + p * c + cross * s + (dir)*dot * (1 - c);
+			VTKData->InsertNextPoint(n, origin.GetX(), origin.GetY(), origin.GetZ());
+		}
 
 	int status = 0;
 	const bmeElementData& elemData = mesh->ElementData();
@@ -54,10 +80,10 @@ int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh) {
 		int length = VTUElementHandler::GetArrayLengthByEnum(type);
 		for (int e = 0; e < elem.NumElements(); ++e) {
 			int* dataSet = (int*)malloc(length * sizeof(int));
-			if (dataSet == NULL)
+			if (dataSet == nullptr)
 				return ERRORTYPE_MEMORY_ALLOC_FAILED;
 
-			if (conn == NULL) return ERRORTYPE_WRONG_ELEMENT_DATA;
+			if (conn == nullptr) return ERRORTYPE_WRONG_ELEMENT_DATA;
 			for (int i = length * e; i < length * (e + 1); ++i) {
 				dataSet[i % length] = VTKData->Index2PositionMap.value(conn[i]);
 			}

@@ -40,11 +40,11 @@ SAMVTUFileIOFragment::SAMVTUFileIOFragment()
 	: ptsKModelFragment()
 {
 	omuInterfaceObj::DescribeType("SAMVTUFileIOFragment", SAMVTUFileIOFMethods, SAMVTUFileIOFMembers);
-	fileManager = NULL;
+	fileManager = nullptr;
 }
 SAMVTUFileIOFragment::~SAMVTUFileIOFragment()
 {
-	if (fileManager != NULL) delete(fileManager);
+	if (fileManager != nullptr) delete(fileManager);
 }
 
 omuPrimitive* SAMVTUFileIOFragment::Copy() const
@@ -120,7 +120,7 @@ omuPrimitive* SAMVTUFileIOFragment::initWriteManager(omuArguments& args) {
 
 	int status = 0;
 	fileManager = new VTUFileManager;
-	if (fileManager != NULL)
+	if (fileManager != nullptr)
 	{
 		fileManager->Init(path, display, modelName, partName);
 		if (!(status |= fileManager->WriteCache())) {
@@ -146,7 +146,7 @@ omuPrimitive* SAMVTUFileIOFragment::initReadManager(omuArguments& args) {
 
 	int status = 0;
 	fileManager = new VTUFileManager;
-	if (fileManager != NULL)
+	if (fileManager != nullptr)
 	{
 		fileManager->Init(path, modelName);
 		//∂¡»Îª∫¥Ê

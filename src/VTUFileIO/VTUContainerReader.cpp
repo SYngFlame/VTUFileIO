@@ -69,7 +69,7 @@ int VTUContainerReader::ConstructNewPart(const QString& modelName, QString& part
 	/* Created nodes and cells*/
 
 	int numElemCls;
-	bmeElementClass** classes = NULL;
+	bmeElementClass** classes = nullptr;
 	int err = ConstructElemClasses(&classes, &numElemCls);
 	if (err) 
 		return ERRORTYPE_WRONG_ELEMENT_DATA;
@@ -134,7 +134,7 @@ int VTUContainerReader::ConstructElemClasses(bmeElementClass*** classes, int* nu
 	if (clsVec.size() > 0) {
 		*classes = (bmeElementClass**)malloc(sizeof(bmeElementClass*) * clsVec.size());
 		VTUHeap.push_back((int*)*classes);
-		if (classes == NULL)
+		if (classes == nullptr)
 			return ERRORTYPE_MEMORY_ALLOC_FAILED;
 		for (int k = 0; k < clsVec.size(); ++k) {
 			(*classes)[k] = clsVec[k];
@@ -152,12 +152,12 @@ int VTUContainerReader::ConstructElemClasses(bmeElementClass*** classes, int* nu
 void VTUContainerReader::ReleaseMemory() {
 	//先释放自由存储区new分配的内存
 	for (int i = 0; i < VTUFree.size(); ++i) {
-		if (VTUFree[i] != NULL)
+		if (VTUFree[i] != nullptr)
 			delete VTUFree[i];
 	}
 	//释放堆内存
 	for (int i = 0; i < VTUHeap.size(); ++i) {
-		if (VTUHeap[i] != NULL)
+		if (VTUHeap[i] != nullptr)
 			free(VTUHeap[i]);
 	}
 	VTUFree.clear();

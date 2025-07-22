@@ -20,15 +20,15 @@
 #include <qstring.h>
 
 VTUFileManager::VTUFileManager() {
-	writer = NULL;
-	fileWriter = NULL;
-	reader = NULL;
-	fileReader = NULL;
+	writer = nullptr;
+	fileWriter = nullptr;
+	reader = nullptr;
+	fileReader = nullptr;
 }
 
 VTUFileManager::~VTUFileManager() {
-	if (writer != NULL) delete(writer);
-	if (fileWriter != NULL) delete(fileWriter);
+	if (writer != nullptr) delete(writer);
+	if (fileWriter != nullptr) delete(fileWriter);
 }
 
 TargetList::TargetList() {
@@ -44,6 +44,13 @@ const ptoKPartRepository& VTUFileManager::ConstGetModelParts(const QString& mode
 	return ptoKConstGetPartRepos(mdb, model);
 }
 
+int VTUFileManager::GetModelId(const QString& model) {
+	basBasis* bas = basBasis::Instance();
+	basMdb mdb = bas->Fetch();
+	basModelMap map = mdb.GetModels();
+	return map.GetID(model);
+}
+
 ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 
 	basBasis* bas = basBasis::Instance();
@@ -53,6 +60,8 @@ ptoKPartRepository& VTUFileManager::GetModelParts(const QString& model) {
 	
 	return dynamic_cast<ptoKPartRepository&>(targetModel.GetPart());
 }
+
+
 
 /*
 Read in mdb for extract nodes and elements and path to output VTK files
@@ -95,8 +104,8 @@ int VTUFileManager::ReadToSAM() {
 	//reader->ReleaseMemory();
 	delete reader;
 	delete writer;
-	writer = NULL;
-	reader = NULL;
+	writer = nullptr;
+	reader = nullptr;
 	return status;
 }
 
@@ -125,9 +134,9 @@ int VTUFileManager::WriteFile() {
 	
 	MessageHandler::ReportExportInfo(fileWriter->GetNodesWritten(), fileWriter->GetCellsWritten());
 	delete fileWriter;
-	fileWriter = NULL;
+	fileWriter = nullptr;
 	delete writer;
-	writer = NULL;
+	writer = nullptr;
 
 	return status;
 }
@@ -141,15 +150,25 @@ int VTUFileManager::writeSinglePart() {
 
 int VTUFileManager::writeAssemblyParts() {
 	asoKAssembly assm = asoKConstGetAssembly(target.TargetModel());
+	auto trans = assm.ConstGetConnectorOrientations();
 	ftrFeatureList* fl = assm.GetFeatureList();
+
 	cowListInt instIDs = asoFPartInstanceAC::GetActiveIds(*fl);
+	cowListString nameList = asoFPartInstanceAC::GetActiveNames(*fl);
+
 	int status = 0;
 	for (int i = 0; i < instIDs.Length(); ++i) {
 		int meshInstID = instIDs.Get(i);
+		
+		const asoFPartInstance* asoIns = asoFPartInstanceAC::ConstGetActive(*fl, nameList[i]);
+		
 		if (!fl->MeshExists(meshInstID))
 			return ERRORTYPE_NOTEXIST;
 		const bmeMesh* mesh = fl->ConstGetMesh(meshInstID);
-		status |= writer->ReadVTKMesh(mesh);
+
+		gslMatrix transMatrix = asoIns->GetTransform();
+
+		status |= writer->ReadVTKMesh(mesh, &transMatrix);
 	}
 	return status;
 }

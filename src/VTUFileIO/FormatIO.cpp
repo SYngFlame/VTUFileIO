@@ -14,11 +14,11 @@ FormatWriter::FormatWriter() {
 }
 
 FormatWriter::~FormatWriter() {
-	if (file != NULL) {
+	if (file != nullptr) {
 		file->close();
 		delete(file);
 	}
-	if(stream != NULL) delete(stream);
+	if(stream != nullptr) delete(stream);
 }
 
 int FormatWriter::Write() {
@@ -44,11 +44,11 @@ FormatReader::FormatReader() {
 }
 
 FormatReader::~FormatReader() {
-	if (file != NULL) {
+	if (file != nullptr) {
 		file->close();
 		delete(file);
 	}
-	if (stream != NULL) delete(stream);
+	if (stream != nullptr) delete(stream);
 }
 
 int FormatReader::Read() {

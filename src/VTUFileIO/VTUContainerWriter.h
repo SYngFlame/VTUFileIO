@@ -9,6 +9,7 @@ class QFile;
 class bmeMesh;
 class bmeElementClass;
 class VTUDataContainer;
+class gslMatrix;
 
 class VTUContainerWriter
 {
@@ -20,7 +21,7 @@ public:
 	~VTUContainerWriter();
 
 	int ReadVTKPart(ptoKPart part);
-	int ReadVTKMesh(const bmeMesh* mesh);
+	int ReadVTKMesh(const bmeMesh* mesh, gslMatrix* transMatrix = nullptr);
 	VTUDataContainer* GetContainerPointer();
 	int VTKExportODB();
 

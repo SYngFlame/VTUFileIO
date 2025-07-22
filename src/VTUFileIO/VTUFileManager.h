@@ -44,7 +44,7 @@ private:
 
 	static ptoKPartRepository& GetModelParts(const QString& model);
 	static const ptoKPartRepository& ConstGetModelParts(const QString& model);
-	static basMdb& GetbasMdb();
+	static int GetModelId(const QString& model);
 	int writeSinglePart();
 	int writeAssemblyParts();
 	int writeODB();

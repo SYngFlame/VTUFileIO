@@ -57,9 +57,9 @@ void VTUFileIOToolsetGui::createMenuItems()
 	auto menuBar = mw->getMenubar();
 	auto childs = menuBar->actions();
 
-	SAMMenu* fileMenu = NULL;
-	SAMMenu* importMenu = NULL;
-	SAMMenu* exportMenu = NULL;
+	SAMMenu* fileMenu = nullptr;
+	SAMMenu* importMenu = nullptr;
+	SAMMenu* exportMenu = nullptr;
 
 	for (QAction* action : menuBar->actions()) {
 		if (action->text().contains("File", Qt::CaseInsensitive)) {
@@ -67,7 +67,7 @@ void VTUFileIOToolsetGui::createMenuItems()
 			break;
 		}
 	}
-	if (fileMenu == NULL) return;
+	if (fileMenu == nullptr) return;
 	for (QAction* action : fileMenu->actions()) {
 		if (action->text().contains("Import", Qt::CaseInsensitive)) {
 			importMenu = (SAMMenu*)action->menu();
@@ -78,8 +78,8 @@ void VTUFileIOToolsetGui::createMenuItems()
 			qDebug() << "VTUFileIO: Export Menu detected.";
 		}
 	}
-	if (exportMenu == NULL) return;
-	if (importMenu == NULL) return;
+	if (exportMenu == nullptr) return;
+	if (importMenu == nullptr) return;
 
 	SAMMenuCommand* SaveVTKCmd = new SAMMenuCommand(this, exportMenu, tr("&VTK Legacy.."));
 	exportMenu->addAction(SaveVTKCmd);
@@ -120,7 +120,7 @@ void VTUFileIOToolsetGui::SaveDialog() {
 void VTUFileIOToolsetGui::OnSave(const QString& path) {
 	VTUFileIOCommand::CommitSave(path);
 	//delete fileDialog;
-	fileDialog = NULL;
+	fileDialog = nullptr;
 }
 
 void VTUFileIOToolsetGui::OpenDialog() {
@@ -139,5 +139,5 @@ void VTUFileIOToolsetGui::OnOpen(const QString& path) {
 	VTUFileIOCommand::CommitOpen(path);
 	// TODO: Whether to delete fileDialog?
 	// delete fileDialog;
-	fileDialog = NULL;
+	fileDialog = nullptr;
 }

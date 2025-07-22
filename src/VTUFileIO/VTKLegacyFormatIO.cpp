@@ -20,7 +20,7 @@ VTKLegacyFormatWriter::VTKLegacyFormatWriter(const QString& path, VTUDataContain
 
 	file = new QFile(targetPath);
 	if (!file->open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-		file = NULL;
+		file = nullptr;
 		return;
 	}
 	stream = new QTextStream(file);
@@ -253,7 +253,7 @@ VTKLegacyFormatReader::VTKLegacyFormatReader(const QString& path, VTUDataContain
 
 	file = new QFile(targetPath);
 	if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-		file = NULL;
+		file = nullptr;
 		return;
 	}
 	stream = new QTextStream(file);

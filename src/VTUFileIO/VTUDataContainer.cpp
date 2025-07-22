@@ -7,8 +7,8 @@ VTUDataContainer::~VTUDataContainer() {
 	int loop = elems.size();
 	for (int i = 0; i < loop; ++i) {
 		{
-			if (elems[i].dataSet != NULL) free(elems[i].dataSet);
-			elems[i].dataSet = NULL;
+			if (elems[i].dataSet != nullptr) free(elems[i].dataSet);
+			elems[i].dataSet = nullptr;
 		}
 	}
 }
@@ -24,7 +24,7 @@ void VTUDataContainer::InsertNextPoint(int index, float x, float y, float z) {
 
 int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* dataSet){
 	Element e;
-	if (!(e.type = type) || (e.dataSet = dataSet) == NULL)
+	if (!(e.type = type) || (e.dataSet = dataSet) == nullptr)
 		return ERRORTYPE_WRONG_ELEMENT_DATA;
 	if (type == VTUElementHandler::VTK_VOXEL) {
 		int temp;
