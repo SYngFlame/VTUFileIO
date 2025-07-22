@@ -8,6 +8,10 @@
 #include <cmdGCommandDeliveryRole.h>
 #include <sesGSessionState.h>
 
+
+#include <SAMApp.h>
+#include <SAMMainWindow.h>
+#include <SAMModuleGui.h>
 void VTUFileIOCommand::CommitPrint() {
 	omuArguments args;
 
@@ -19,6 +23,14 @@ void VTUFileIOCommand::CommitPrint() {
 	QString cmd;
 	cmd.append(mc);
 	cmdGCommandDeliveryRole::Instance().SendCommand(cmd);
+
+
+
+
+	SAMApp* app = SAMApp::getSAMApp();
+	SAMMainWindow* mw = app->getSAMMainWindow();
+	mw->getModules();
+
 	return;
 }
 

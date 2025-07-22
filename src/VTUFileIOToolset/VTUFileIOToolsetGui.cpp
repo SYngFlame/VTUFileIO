@@ -16,6 +16,8 @@
 VTUFileIOToolsetGui::VTUFileIOToolsetGui()
 	: SAMToolsetGui("Test")
 {
+	ubiFileToolsetGui& fileToolset = ubiFileToolsetGui::Instance();
+	fileToolset.createMenuItems();
 	createMenuItems();
 	createToolboxItems();
 	VTUFileIOCommand::CommitLoad();

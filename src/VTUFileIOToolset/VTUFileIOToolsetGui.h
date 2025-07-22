@@ -21,8 +21,6 @@ class VTUFileIOForm;
 class basBasis;
 
 //
-// Class definition
-//
 
 class VTUFileIOToolsetGui : public SAMToolsetGui
 {
@@ -32,6 +30,9 @@ public:
     // Constructor and destructor:
     VTUFileIOToolsetGui();
     ~VTUFileIOToolsetGui();
+    // 添加公共方法供插件调用
+    void importVTU();
+    void exportVTU();
 
 private:
     // Copy constructor and assignment operator
@@ -50,8 +51,6 @@ protected:
     /// Creates the module's toolbox.
     virtual void createToolboxItems();
 
-private:
-    SAMFileDialog* fileDialog;
     
 private slots:
     void PrintMsg();
@@ -61,6 +60,11 @@ private slots:
 
     void OpenDialog();
     void OnOpen(const QString& path);
+
+    void onImport(const QString& path);
+    void onExport(const QString& path);
+private:
+    SAMFileDialog* fileDialog = nullptr;
 };
 
 #endif

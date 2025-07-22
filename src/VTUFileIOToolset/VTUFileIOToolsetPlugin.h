@@ -3,8 +3,8 @@
 
 #include <QtPlugin>
 #include <SAMToolsetGuiInterface.h>
-
-
+#include <QMenu>
+#include <QObject>
 
 class VTUFileIOToolsetPlugin : public QObject, SAMToolsetGuiInterface
 {
@@ -17,7 +17,15 @@ public:
 
 public:
 	virtual void registerToolset();
-};
 
+private:
+	// 辅助函数：在菜单中查找子菜单
+	QMenu* findSubmenu(QMenu* parentMenu, const QString& name);
+/*
+private slots:
+	void onImportVTU();
+	void onExportVTU();
+};
+*/
 
 #endif
