@@ -38,6 +38,7 @@ VTUElementHandler::VTKType VTUElementHandler::SimplyConvertTo2DVTKType(const QSt
 VTUElementHandler::VTKType VTUElementHandler::SimplyConvertTo3DVTKType(const QString& typeLabel) {
 
 	if (typeLabel == "C3D8"|| typeLabel == "C3D8R") return VTK_VOXEL;
+	if (typeLabel == "C3D4") return VTK_TETRA;
 
 	return VTK_NONE;
 }
@@ -76,6 +77,8 @@ int VTUElementHandler::GetArrayLengthByEnum(VTKType typeEnum) {
 			return 3;
 		case VTK_PIXEL:case VTK_QUAD:
 			return 4;
+		case VTK_TETRA:
+			return 4;
 		case VTK_VOXEL:case VTK_HEXAHEDRON:
 			return 8;
 	}
@@ -108,7 +111,7 @@ QString VTUElementHandler::GetSAMTypeByVTKType(VTKType typeEnum, int beamType, i
 		case VTK_PIXEL:case VTK_QUAD:
 			return quadType ? (quadType == 1 ? "S4I" : "S4R") : "S4";
 		case VTK_TETRA:
-			return "";
+			return "C3D4";
 		case VTK_VOXEL:
 			return cubeType ? "C3D8R" : "C3D8";
 		case VTK_HEXAHEDRON:

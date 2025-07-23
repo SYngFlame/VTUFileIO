@@ -92,6 +92,7 @@ int VTUContainerWriter::ReadVTKMesh(const bmeMesh* mesh, bool transform, gslMatr
 
 		}
 	}
+	VTKData->CorrectSAMCubeData();
 	return status;
 }
 

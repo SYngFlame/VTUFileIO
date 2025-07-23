@@ -1,15 +1,27 @@
 # VTUFileIO 开发日志（按日期整理，2025.7.11-2025.7.22）
 
+## 2025.7.23
+
+- *SYngFlame* 修复问题：导入 .inp 后无法立刻导出装配 VTK 文件。该问题由传入 Part 名为空引起 Gui侧模块 return 退出，现在 Part 名为空将传入空字符串。
 
 ## 2025.7.22  
 - *notcharlatan* 完成本文档书写。
 - 修复VTK立方体模型导入时的数据错误（如坐标偏移、顶点索引错乱），修正解析逻辑：  
   ```cpp
   // 校正立方体顶点顺序，确保拓扑结构正确
-  void fixCubeVertexOrder(QList<Vertex>& vertices) {
-      if (vertices.size() == 8) { // 立方体固定8个顶点
-          std::swap(vertices[2], vertices[3]); // 修复特定顶点的位置映射
+  void VTUDataContainer::CorrectSAMCubeData() {
+    for (int i = 0; i < elems.size(); ++i) {
+      if (VTUElementHandler::IsCube(elems[i].type)) {
+        int* dataSet = elems[i].dataSet;
+        int temp;
+        temp = dataSet[2];
+        dataSet[2] = dataSet[3];
+        dataSet[3] = temp;
+        temp = dataSet[6];
+        dataSet[6] = dataSet[7];
+        dataSet[7] = temp;
       }
+    }
   }
   ```  
   效果：导入VTK立方体模型后，顶点坐标与拓扑关系准确。  

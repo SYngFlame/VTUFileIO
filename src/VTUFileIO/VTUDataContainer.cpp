@@ -26,15 +26,6 @@ int VTUDataContainer::InsertNextElement(VTUElementHandler::VTKType type, int* da
 	Element e;
 	if (!(e.type = type) || (e.dataSet = dataSet) == nullptr)
 		return ERRORTYPE_WRONG_ELEMENT_DATA;
-	if (VTUElementHandler::IsCube(type)) {
-		int temp;
-		temp = dataSet[2];
-		dataSet[2] = dataSet[3];
-		dataSet[3] = temp;
-		temp = dataSet[6];
-		dataSet[6] = dataSet[7];
-		dataSet[7] = temp;
-	}
 	elems.push_back(e);
 	elemVertices += VTUElementHandler::GetArrayLengthByEnum(e.type) + 1;
 

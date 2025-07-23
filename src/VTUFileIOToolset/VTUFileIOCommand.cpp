@@ -27,12 +27,15 @@ void VTUFileIOCommand::CommitSave(const QString& path) {
 	const sesGVpContext& context = sesGSessionState::Instance()->ConstGetVpContext();
 	//TODO:Print Messages when there's nothing in context or else
 	QString pyt = QString("mdb.models['%1']").arg(context.ModelName());
-	if (context.ModelName().isEmpty() || context.PartName().isEmpty()) return;
+	if (context.ModelName().isEmpty()) return;
 	omuArguments args(4);
 	args.Put(path);
 	args.Put((int)(context.TypeByModule()));
 	args.Put(context.ModelName());
-	args.Put(context.PartName());
+	if(context.PartName().isEmpty())
+		args.Put(QString(""));
+	else
+		args.Put(context.PartName());
 
 	omuMethodCall mc(pyt, "initWriteManager", args);
 	QString cmd;
