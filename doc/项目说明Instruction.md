@@ -48,7 +48,7 @@ VTUFileIO 模块支持 SAM 网格数据对 VTK 格式数据的导入导出。
 
 VTK文件是一种常见的三维图形数据的文件格式，常用于物理模型的建模数据。在CAE软件中，VTK可以支持其后处理数据导出功能，保存其后处理数据如U(位移)，S(Von Mises应力)。
 
-除去**Point**、**Beam**（梁单元，B31）等类型外，SAM支持的单元类型还有**Quad4**(S4R)，**Triangle3**(S3)，**Truss**(T3D2)三种基本单元，与VTK对应如下：
+除去**Beam**（梁单元，B31，B33）、**Truss**(T3D2)一维单元，SAM支持的单元类型还有**Quad4**(S4，S4R，S4I)、**Triangle3**(S3，S3R)、二维单元，**Tetra**(C3D4)，**Cube**(C3D8,C3D8R)。与VTK对应如下：
 
 |SAM单元|VTK单元|VTK单元类型编号|
 |:--------|:--------|:--------|
@@ -56,6 +56,9 @@ VTK文件是一种常见的三维图形数据的文件格式，常用于物理�
 |T3D2|VTK_LINE 3|![Line Cell](./pictures/Line.png)|
 |S3|VTK_TRIANGLE 5|![Triangle Cell](./pictures/Triangle.png)|
 |S4R|VTK_QUAD 9|![Quad Cell](./pictures/Rectangle.png)|
+|C3D4|VTK_TETRA 10|![Tetra Cell](./pictures/Tetra.png)|
+|C3D8|VTK_VOXEL 11|![Voxel Cell](./pictures/Voxel.png)|
+|C3D8R|VTK_VOXEL 11|![Voxel Cell](./pictures/Voxel.png)|
  
 在SAM和VTK中面单元的顶点顺序均为逆时针为正向，保持SAM中单元的`Connectivity`顺序即可保持法向量不变。
 
